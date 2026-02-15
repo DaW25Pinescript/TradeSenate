@@ -5,453 +5,716 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Trade Senate</title>
   <style>
-    :root {
-      color-scheme: dark;
-      --bull: #10b981;
-      --bear: #ef4444;
-      --risk: #8b5cf6;
-      --wait: #fbbf24;
+    :root{
+      --bg:#0b0f14;
+      --card:#0f1622;
+      --card2:#0c1420;
+      --border:#1f2a3a;
+      --muted:#8aa0b8;
+      --text:#e7eef7;
 
-      --bg: #0b0f14;
-      --card: #0f1621;
-      --border: #1c2633;
-      --border2: #263245;
+      --bull:#10b981;
+      --bear:#ef4444;
+      --warn:#f59e0b;
+      --gold:#b8942d;
 
-      --text: #e8eef7;
-      --muted: #9db0c7;
-      --soft: #0b0f14;
-
-      --shadow: 0 6px 18px rgba(0,0,0,.25);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius: 14px;
     }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(1100px 600px at 30% -10%, rgba(59,130,246,.18), transparent 60%),
+                  radial-gradient(900px 540px at 90% 0%, rgba(16,185,129,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      line-height:1.35;
+    }
+    a{color:inherit}
+    .shell{max-width: 1400px; margin: 0 auto; padding: 14px;}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; padding: 10px 12px; border-radius: var(--radius);
+      background: rgba(0,0,0,.2);
+      border:1px solid rgba(255,255,255,.04);
+      box-shadow: var(--shadow);
+      position: sticky; top: 0; z-index: 5;
+      backdrop-filter: blur(8px);
+    }
+    .title{
+      font-weight: 900; letter-spacing: .2px;
+      display:flex; align-items:baseline; gap:10px; flex-wrap: wrap;
+    }
+    .title .h{font-size: 16px;}
+    .title .sub{font-size: 11px; color:var(--muted); font-weight: 650; opacity:.9;}
+    .controls{display:flex; align-items:center; gap:8px;}
+    button{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-weight: 750;
+      font-size: 12px;
+    }
+    button:hover{background: rgba(255,255,255,.05)}
+    .pill{
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      color: var(--muted);
+      background: rgba(255,255,255,.02);
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .pill.good{ border-color:#0b4d3a; color:#c6ffe8; background: rgba(16,185,129,.12); }
+    .pill.bad{ border-color:#4d0b0b; color:#ffd0d0; background: rgba(239,68,68,.12); }
+    .pill.warn{ border-color:#4d3b0b; color:#ffe9b8; background: rgba(245,158,11,.12); }
+    .pill.live{ border-color:#0b4d3a; color:#c6ffe8; background: rgba(16,185,129,.12); }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; line-height: 1.45; }
-
-    header {
-      padding: 16px 20px; border-bottom: 1px solid var(--border);
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      position: sticky; top: 0; background: rgba(11,15,20,.92); backdrop-filter: blur(6px); z-index: 10;
+    .layout{
+      display:grid;
+      grid-template-columns: 1.05fr 1.15fr 1.35fr;
+      gap: 14px;
+      padding-top: 14px;
+      align-items:start;
+    }
+    @media (max-width: 1100px){
+      .layout{ grid-template-columns: 1fr; }
+      .topbar{ position: static; }
     }
 
-    .titleWrap { display:flex; flex-direction:column; gap:4px; }
-    .title { font-size: 18px; font-weight: 900; letter-spacing: .2px; display:flex; gap:10px; align-items: baseline; }
-    .subtitle { font-size: 12px; color: var(--muted); }
-
-    .row { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
-    .btn {
-      cursor:pointer; border-radius: 12px; border:1px solid var(--border2);
-      padding: 8px 10px; background: var(--soft); color: var(--text);
-      font-size: 12px; font-weight: 900;
-    }
-    .btn:hover { border-color:#3a4a63; }
-    .btn:active { transform: translateY(1px); }
-
-    .pill {
-      display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius: 999px;
-      border: 1px solid var(--border2); font-size: 12px; font-weight: 900; user-select:none; white-space:nowrap;
-    }
-    .pill.good    { border-color:#1f6f3f; color:#bff1d0; background: rgba(31,111,63,.18); }
-    .pill.bad     { border-color:#7a2b2b; color:#ffd0d0; background: rgba(122,43,43,.18); }
-    .pill.neutral { border-color:#3a4a63; color:#c8d6ea; background: rgba(58,74,99,.18); }
-
-    .layout {
-      display:grid; grid-template-columns: 1.05fr 1.15fr 1.35fr; gap: 14px; padding: 14px; align-items:start;
-    }
-    .card { background: var(--card); border:1px solid var(--border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); }
-
-    h2 {
-      margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color:#b8c7da;
-      display:flex; align-items:center; gap:8px;
-    }
-
-    .kv { display:grid; grid-template-columns: 140px 1fr; gap: 8px 10px; font-size: 13px; }
-    .k { color: var(--muted); }
-    .v { color: var(--text); font-weight: 650; }
-
-    code { background: var(--soft); padding: 2px 6px; border-radius: 8px; border:1px solid var(--border); color: #d5e2f5; }
-
-    /* Agents */
-    .agent { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #253246; }
-    .agentTop { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .agentLeft { display:flex; align-items:center; gap:10px; }
-
-    .avatar {
-      width: 38px; height: 38px; border-radius: 999px; display:grid; place-items:center;
-      font-weight: 950; font-size: 16px; border: 1px solid var(--border2); background: #0b0f14; flex: 0 0 auto;
-    }
-    .avatar.bull { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.35); color: var(--bull); }
-    .avatar.bear { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.35); color: var(--bear); }
-    .avatar.risk { background: rgba(139,92,246,0.15); border-color: rgba(139,92,246,0.35); color: var(--risk); }
-    .avatar.wait { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.35); color: var(--wait); }
-
-    .agentName { font-weight: 950; }
-    .agentRole { font-size: 12px; color: var(--muted); margin-top:2px; }
-
-    details.reasoning {
-      margin-top: 10px; border-radius: 12px; border: 1px solid var(--border);
-      background: rgba(148,163,184,0.06); padding: 10px 12px;
-    }
-    details.reasoning > summary {
-      list-style: none; cursor: pointer; display:flex; align-items:center; justify-content:space-between;
-      gap:10px; color: #c6d5ea; font-weight: 900; user-select:none;
-    }
-    details.reasoning > summary::-webkit-details-marker { display: none; }
-    .chev { display:inline-block; font-size: 12px; opacity: .9; transform: rotate(-90deg); transition: transform .16s ease; }
-    details.reasoning[open] .chev { transform: rotate(0deg); }
-    ul { margin: 8px 0 0 18px; padding: 0; }
-    li { margin: 6px 0; color: #d9e4f2; }
-
-    .claim {
-      margin-top: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border);
-      background: rgba(148,163,184,0.10); border-left: 4px solid #94a3b8; color: #dbe7f7; font-weight: 700;
-    }
-    .claim.bull { border-left-color: var(--bull); }
-    .claim.bear { border-left-color: var(--bear); }
-    .claim.risk { border-left-color: var(--risk); }
-    .claim.wait { border-left-color: var(--wait); }
-
-    .tag {
-      display:inline-flex; margin-top: 10px; padding: 4px 10px; border-radius: 999px;
-      font-size: 12px; font-weight: 950; border:1px solid var(--border); background: rgba(148,163,184,0.10); color: #dbe7f7;
-    }
-
-    /* Decision */
-    .decisionHero {
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border:1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: linear-gradient(135deg, rgba(30,58,138,0.55), rgba(59,130,246,0.30));
-      box-shadow: 0 10px 24px rgba(0,0,0,.25);
-      transition: border-color .18s ease, box-shadow .18s ease;
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
-    .decisionHero.bull { border-color: rgba(16,185,129,0.55); box-shadow: 0 10px 24px rgba(16,185,129,.10), 0 10px 24px rgba(0,0,0,.25); }
-    .decisionHero.bear { border-color: rgba(239,68,68,0.55); box-shadow: 0 10px 24px rgba(239,68,68,.10), 0 10px 24px rgba(0,0,0,.25); }
-    .decisionHero.wait { border-color: rgba(251,191,36,0.65); box-shadow: 0 10px 24px rgba(251,191,36,.10), 0 10px 24px rgba(0,0,0,.25); }
-    .decisionHero.risk { border-color: rgba(139,92,246,0.55); box-shadow: 0 10px 24px rgba(139,92,246,.10), 0 10px 24px rgba(0,0,0,.25); }
+    .card .hd{
+      padding: 12px 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: rgba(0,0,0,.14);
+    }
+    .card .hd .t{
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: rgba(231,238,247,.78);
+    }
+    .card .bd{ padding: 12px; }
+    .row{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,.05); }
+    .row:last-child{ border-bottom:none; }
+    .k{ color: var(--muted); font-size: 11px; }
+    .v{ font-weight: 800; font-size: 12px; }
+    .v.bull{ color: var(--bull); }
+    .v.bear{ color: var(--bear); }
+    .v.warn{ color: var(--warn); }
 
-    .decisionTitle { display:flex; align-items:center; justify-content:center; gap:8px; font-weight: 950; opacity: .95; }
-    .decisionAction { text-align:center; font-size: 28px; font-weight: 950; margin: 8px 0 6px; letter-spacing: -0.5px; }
-    .decisionReason { text-align:center; color: rgba(255,255,255,0.92); font-weight: 700; line-height: 1.45; }
-    .decisionRule { margin-top: 10px; text-align:center; opacity: .92; font-style: italic; font-weight: 700; }
+    .sectionLabel{
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      font-weight: 900;
+      font-size: 10px;
+      letter-spacing: .18em;
+      color: rgba(231,238,247,.70);
+    }
 
-    .sticky { position: sticky; top: 76px; }
-    @media (max-width: 1100px){ .layout { grid-template-columns: 1fr; } .sticky { position: static; top: auto; } }
+    /* Senators */
+    .senator{
+      background: rgba(0,0,0,.14);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius: 12px;
+      overflow:hidden;
+      margin-bottom: 10px;
+    }
+    .senator:last-child{ margin-bottom: 0; }
+    .s-hd{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:10px;
+      padding: 10px 10px 8px;
+      border-left: 3px solid rgba(255,255,255,.12);
+    }
+    .senator.bull .s-hd{ border-left-color: rgba(16,185,129,.85); }
+    .senator.bear .s-hd{ border-left-color: rgba(239,68,68,.85); }
+    .senator.risk .s-hd{ border-left-color: rgba(184,148,45,.85); }
+
+    .s-left{ display:flex; align-items:flex-start; gap:10px; }
+    .avatar{
+      width: 26px; height: 26px; border-radius: 999px;
+      display:grid; place-items:center; font-weight: 950; font-size: 12px;
+      background: rgba(255,255,255,.06);
+      color: rgba(231,238,247,.85);
+      flex: 0 0 auto;
+    }
+    .senator.bull .avatar{ background: rgba(16,185,129,.18); color: #d9fff0; }
+    .senator.bear .avatar{ background: rgba(239,68,68,.18); color: #ffe1e1; }
+    .senator.risk .avatar{ background: rgba(184,148,45,.18); color: #ffefc1; }
+
+    .nm{ font-weight: 950; font-size: 13px; }
+    .rl{ color: var(--muted); font-size: 10px; margin-top: 1px; }
+    .claim{
+      padding: 8px 10px;
+      border-top: 1px solid rgba(255,255,255,.04);
+      background: rgba(255,255,255,.02);
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(231,238,247,.92);
+    }
+    .p{
+      padding: 8px 10px 2px;
+      color: rgba(231,238,247,.82);
+      font-size: 11px;
+    }
+    .p ul{ margin: 6px 0 8px 16px; padding:0; }
+    .p li{ margin: 6px 0; }
+    details{
+      margin: 0 10px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(0,0,0,.16);
+      overflow:hidden;
+    }
+    summary{
+      cursor:pointer;
+      list-style:none;
+      padding: 8px 10px;
+      font-weight: 900;
+      color: rgba(231,238,247,.82);
+      display:flex; justify-content:space-between; align-items:center;
+      font-size: 11px;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    summary .chev{ opacity:.7; font-size: 11px; }
+    details[open] summary .chev{ transform: rotate(180deg); }
+    details .inner{ padding: 0 10px 10px; color: rgba(231,238,247,.78); font-size: 11px; }
+    .tagline{
+      display:inline-block;
+      margin-left: 8px;
+      font-weight: 900;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: rgba(231,238,247,.86);
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+
+    /* War Room: ensemble bar */
+    .warroom{
+      display:flex; flex-direction:column; gap: 10px;
+    }
+    .ensemble{
+      border:1px solid rgba(255,255,255,.06);
+      background: rgba(0,0,0,.14);
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .ensembleTop{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .ensembleTop .lbl{ font-weight: 950; font-size: 11px; color: rgba(231,238,247,.82); letter-spacing:.08em; }
+    .ensembleTop .score{ font-weight: 950; font-size: 11px; color: rgba(231,238,247,.78); }
+    .bar{
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(239,68,68,.25), rgba(239,68,68,.15) 35%, rgba(255,255,255,.07) 50%, rgba(16,185,129,.15) 65%, rgba(16,185,129,.25));
+      border: 1px solid rgba(255,255,255,.06);
+      position: relative;
+      margin-top: 8px;
+      overflow:hidden;
+    }
+    .needle{
+      position:absolute;
+      top:-4px;
+      width: 2px;
+      height: 20px;
+      background: rgba(231,238,247,.92);
+      box-shadow: 0 0 0 2px rgba(0,0,0,.25);
+      border-radius: 2px;
+      left: 50%;
+      transform: translateX(-1px);
+    }
+    .barLabels{
+      display:flex; justify-content:space-between; margin-top: 8px;
+      font-size: 10px; font-weight: 900; color: rgba(231,238,247,.60);
+    }
+
+    /* Decision hero + Scorecard */
+    .decisionHero{
+      border-radius: 12px;
+      background: radial-gradient(800px 220px at 50% 0%, rgba(59,130,246,.40), rgba(59,130,246,.12) 55%, rgba(0,0,0,.0) 70%),
+                  linear-gradient(135deg, rgba(30,58,138,.55), rgba(59,130,246,.35));
+      border: 1px solid rgba(255,255,255,.06);
+      padding: 18px 14px;
+      position: relative;
+      overflow:hidden;
+    }
+    .decisionHero.hero-bull{ border-color: rgba(16,185,129,.55); box-shadow: 0 0 0 1px rgba(16,185,129,.20), var(--shadow); }
+    .decisionHero.hero-bear{ border-color: rgba(239,68,68,.55); box-shadow: 0 0 0 1px rgba(239,68,68,.20), var(--shadow); }
+    .decisionHero.hero-warn{ border-color: rgba(184,148,45,.65); box-shadow: 0 0 0 1px rgba(184,148,45,.25), var(--shadow); }
+
+    .decisionHero .small{ font-weight: 950; font-size: 11px; color: rgba(255,255,255,.85); display:flex; justify-content:center; gap:8px; }
+    .decisionHero .act{ text-align:center; font-weight: 1000; letter-spacing: .2px; font-size: 26px; margin: 10px 0 6px; }
+    .decisionHero .rsn{ text-align:center; font-weight: 750; font-size: 12px; color: rgba(255,255,255,.88); }
+    .decisionHero .rule{ text-align:center; margin-top: 10px; font-style: italic; font-weight: 750; font-size: 11px; color: rgba(255,255,255,.86); }
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    th, td{
+      text-align:left;
+      padding: 8px 8px;
+      border-bottom: 1px dashed rgba(255,255,255,.06);
+      vertical-align: top;
+    }
+    th{ color: rgba(231,238,247,.72); font-weight: 950; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+    td{ color: rgba(231,238,247,.82); font-weight: 700; }
+    .scorePos{ color: #c6ffe8; }
+    .scoreNeg{ color: #ffe1e1; }
+    .scoreZero{ color: rgba(231,238,247,.72); }
+
+    .gate{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: rgba(0,0,0,.14);
+    }
+    .gate .gLbl{ font-weight: 950; font-size: 11px; letter-spacing: .12em; color: rgba(231,238,247,.78); }
+    .gate .gVal{ font-weight: 950; font-size: 12px; }
+    .gate.pass .gVal{ color: var(--bull); }
+    .gate.fail .gVal{ color: var(--bear); }
+
+    /* Protocol panel */
+    .roundTabs{ display:flex; flex-wrap:wrap; gap:6px; margin-top: 10px; }
+    .tab{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color: rgba(231,238,247,.86);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .tab.active{ border-color: rgba(59,130,246,.55); background: rgba(59,130,246,.14); }
+    .transcript{
+      margin-top: 10px;
+      border:1px solid rgba(255,255,255,.06);
+      background: rgba(0,0,0,.14);
+      border-radius: 12px;
+      overflow:hidden;
+    }
+    .turn{
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .turn:last-child{ border-bottom:none; }
+    .who{ font-weight: 950; font-size: 12px; display:flex; justify-content:space-between; gap:10px; }
+    .who .meta{ color: rgba(231,238,247,.62); font-size: 10px; font-weight: 850; }
+    .txt{ margin-top: 6px; color: rgba(231,238,247,.80); font-size: 11px; }
+    .mini{
+      font-size: 10px; color: rgba(231,238,247,.65); font-weight: 800; margin-top: 6px;
+    }
+
+    .hint{
+      margin-top: 8px;
+      color: rgba(231,238,247,.52);
+      font-size: 10px;
+      font-weight: 700;
+    }
   </style>
 </head>
+
 <body>
-  <header>
-    <div class="titleWrap">
-      <div class="title"><span id="pageTitle">Trade Senate</span></div>
-      <div class="subtitle" id="pageMeta">Loading…</div>
+  <div class="shell">
+    <div class="topbar">
+      <div class="title">
+        <div class="h" id="topTitle">Trade Senate</div>
+        <div class="sub" id="topSub">—</div>
+      </div>
+      <div class="controls">
+        <button id="btnRefresh" type="button">↻ Refresh</button>
+        <span class="pill live" id="pillLive">LIVE JSON</span>
+      </div>
     </div>
-    <div class="row">
-      <button class="btn" id="btnRefresh">↻ Refresh</button>
-      <span class="pill neutral" id="statusPill">WAITING</span>
+
+    <div class="layout">
+      <!-- LEFT: Context + Protocol -->
+      <div class="card">
+        <div class="hd"><div class="t">MARKET CONTEXT</div><span class="pill" id="pillState">—</span></div>
+        <div class="bd">
+          <div id="ctxRows"></div>
+
+          <div class="sectionLabel">ANCHORS</div>
+          <div id="anchorRows"></div>
+
+          <div class="sectionLabel">PROTOCOL</div>
+          <div class="roundTabs" id="roundTabs"></div>
+          <div class="transcript" id="transcript"></div>
+          <div class="hint" id="protocolHint">Select a round to view the war-room transcript.</div>
+        </div>
+      </div>
+
+      <!-- CENTER: War Room -->
+      <div class="card">
+        <div class="hd"><div class="t">WAR ROOM</div><span class="pill" id="pillEnsemble">—</span></div>
+        <div class="bd warroom">
+          <div class="ensemble">
+            <div class="ensembleTop">
+              <div class="lbl">Ensemble · Tug of War</div>
+              <div class="score" id="ensScore">score: —</div>
+            </div>
+            <div class="bar" aria-label="Ensemble score bar">
+              <div class="needle" id="ensNeedle"></div>
+            </div>
+            <div class="barLabels"><span>SHORT</span><span>NO TRADE</span><span>LONG</span></div>
+          </div>
+
+          <div id="senators"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Scorecard + Decision -->
+      <div class="card">
+        <div class="hd"><div class="t">DECISION</div><span class="pill" id="pillDecision">—</span></div>
+        <div class="bd">
+          <div class="decisionHero hero-warn" id="decisionHero">
+            <div class="small">✓ Senate Decision</div>
+            <div class="act" id="decAction">—</div>
+            <div class="rsn" id="decReason">—</div>
+            <div class="rule" id="decRule">—</div>
+          </div>
+
+          <div class="sectionLabel" style="margin-top: 14px;">SCORECARD</div>
+          <div style="overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Agent</th>
+                  <th>Score</th>
+                  <th>Weight</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody id="scoreRows"></tbody>
+            </table>
+          </div>
+
+          <div class="gate" id="gateBox">
+            <div>
+              <div class="gLbl">SYSTEM GATE</div>
+              <div class="mini" id="gateReason">—</div>
+            </div>
+            <div class="gVal" id="gateVal">—</div>
+          </div>
+        </div>
+      </div>
     </div>
-  </header>
 
-  <div class="layout">
-    <section class="card sticky">
-      <h2>Market Context</h2>
-      <div class="kv" id="contextKV"></div>
-
-      <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
-        <h2>Anchors</h2>
-        <div class="kv" id="metaKV"></div>
-      </div>
-
-      <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
-        <h2>Protocol</h2>
-        <div id="protocolBox" style="font-size:13px; color:#d9e4f2;"></div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>Senators</h2>
-      <div id="agentsList"></div>
-    </section>
-
-    <section class="card sticky">
-      <h2>Decision</h2>
-      <div class="decisionHero risk" id="decisionHero" hidden>
-        <div class="decisionTitle"><span>✓</span><span>Senate Decision</span></div>
-        <div class="decisionAction" id="decisionAction">—</div>
-        <div class="decisionReason" id="decisionReason"></div>
-        <div class="decisionRule" id="decisionRule"></div>
-      </div>
-
-      <div class="kv" id="decisionKV" style="margin-top:12px;"></div>
-    </section>
+    <div class="hint" style="padding: 8px 2px;">
+      UI reads <code>../STATE/debate.json</code> every refresh. If unreachable, it falls back to embedded DEMO data.
+    </div>
   </div>
 
 <script>
-const DEMO = {
-  meta: { schemaVersion: "1.1", title: "Trade Senate Demo", generatedAt: new Date().toISOString(), stateHash: "demo", sequence: 1 },
-  context: { symbol: "BTCUSDT", timeframe: "1H", lastPrice: 48250.5, session: "NY", htfBias: "Bullish", volatility: "Normal", pdh: 48500.0, pdl: 47000.0, activeFvgs: ["48210–48280"] },
-  agents: [
-    { name: "Magnus", role: "Chief of Staff", stance: "NO_TRADE", summary: "No-trade until structure aligns with HTF bias.", reasoning: ["Await MSS/BOS confirmation."], confidence: 0.62 },
-    { name: "Atlas", role: "Technical Analyst", stance: "LONG", summary: "HTF bias bullish; prefer longs after confirmation.", reasoning: ["HTF bias = Bullish."], confidence: 0.58 },
-    { name: "Vela", role: "Price Action Analyst", stance: "NO_TRADE", summary: "Wait for MSS→BOS confirmation before taking risk.", reasoning: ["MSS=false, BOS=false"], confidence: 0.66 },
-    { name: "Nyx", role: "Risk Manager", stance: "NO_TRADE", summary: "Risk gate check: allow only if constraints pass.", reasoning: ["No debate around limits."], confidence: 0.80 }
-  ],
-  decision: { action: "NO_TRADE", reason: "Await MSS/BOS confirmation. Consensus threshold not met.", nextCheck: "Next 1–2 candles", rule: "Let the market come to you." },
-  protocol: {
-    rounds: [
-      { round: 1, label: "Independent", turns: [] },
-      { round: 2, label: "Rebuttal", turns: [] },
-      { round: 3, label: "Vote", vote: { weights: {}, tally: {LONG:0.58, SHORT:0.0, NO_TRADE:0.66}, winner: "NO_TRADE" } }
+  // ----- DEMO (fallback if debate.json missing) -----
+  const DEMO = {
+    meta: { schemaVersion: "1.2", title: "Trade Senate Demo · EURUSD M15", generatedAt: new Date().toISOString(), stateHash: "demo", sequence: 1 },
+    context: { symbol: "EURUSD", timeframe: "M15", lastPrice: 1.0842, session: "London", htfBias: "Bullish", volatility: "Normal", pdh: 1.0871, pdl: 1.0798, activeFvgs: ["1.0820–1.0830"] },
+    agents: [
+      { name: "Atlas", role: "Technical Analyst", stance: "LONG", summary: "Ascending support holding; higher lows.", paragraphs: ["Price respecting a rising trendline. Risk can be defined below last swing low."], reasoning: ["Two-touch trendline with clean reaction.","PDH overhead may act as magnet / take-profit area."], confidence: 0.58 },
+      { name: "Magnus", role: "Chief of Staff", stance: "NO_TRADE", summary: "No-trade until structure aligns with HTF bias.", paragraphs: ["Conflicting signals. Require a clean MSS→BOS and retest before committing risk."], reasoning: ["HTF bias bullish but LTF structure not confirmed.","Volatility normal → no need to force entries."], confidence: 0.62 },
+      { name: "Nyx", role: "News/Sentiment", stance: "NO_TRADE", summary: "No catalyst; headlines neutral.", paragraphs: ["No high-impact event expected in the next hour."], reasoning: ["Neutral sentiment → chop risk elevated."], confidence: 0.55 },
+      { name: "Vela", role: "Price Action Analyst", stance: "NO_TRADE", summary: "Needs MSS→BOS confirmation.", paragraphs: ["Market is still overlapping; wait for displacement + BOS."], reasoning: ["No clean MSS yet; pivots overlap → range conditions."], confidence: 0.66 },
+      { name: "Risk", role: "Risk Manager", stance: "NO_TRADE", summary: "Gate check: spread/volatility must pass.", paragraphs: ["If safety gate fails, force NO_TRADE regardless of bias."], reasoning: ["Stop must exceed noise; do not trade into illiquid conditions."], confidence: 0.80 }
     ],
-    disagreements: [{ topic:"structure_confirmed", for:["Atlas"], against:["Vela","Magnus"], impact:"requires_confirmation"}],
-    riskGates: [{ gate:"structure_confirmed", pass:false, details:"MSS and BOS must be true for entries"}]
-  }
-};
+    decision: { action: "NO_TRADE", reason: "Weighted vote + scorecard confluence.", nextCheck: "Next 1–2 candles", rule: "Let the market come to you." },
+    scorecard: {
+      criteria: [
+        { key:"htf_context", label:"HTF Context", agent:"Magnus", weight:1.2, score:2, min:0, max:2, note:"HTF bias: Bullish" },
+        { key:"execution_edge", label:"Execution Edge", agent:"Vela", weight:1.0, score:0, min:0, max:3, note:"MSS=false BOS=false" },
+        { key:"confluence", label:"Confluence", agent:"Atlas", weight:1.0, score:2, min:0, max:2, note:"FVGs=1 PDH/PDL=Y" },
+        { key:"external_risk", label:"External Risk", agent:"Nyx", weight:0.8, score:-1, min:-3, max:0, note:"News risk: neutral" },
+        { key:"safety_gate", label:"Safety Gate", agent:"Risk", weight:1.5, score:1, min:0, max:1, note:"PASS" },
+      ],
+      summary: { weightedTotal: 3.1, weightedMax: 6.9, gate: { passed: true, reason: "OK" } }
+    },
+    ensemble: { method:"weighted_vote_v1", threshold:0.35, score:0.17, rawScore:0.17, result:"NO_TRADE", gateApplied:false },
+    protocol: {
+      rounds: [
+        { id:"r1", label:"Round 1 · Initial Bias", turns: [] },
+        { id:"r2", label:"Round 2 · Cross-Examination", turns: [] },
+        { id:"r3", label:"Final Vote", turns: [], final: { vote: { result:"NO_TRADE" } } }
+      ]
+    }
+  };
 
-function fmt(v){
-  if (v === null || v === undefined) return "—";
-  if (typeof v === "number") return (Math.abs(v) >= 1000 ? v.toFixed(0) : v.toString());
-  if (Array.isArray(v)) return v.length ? v.join(", ") : "—";
-  return String(v);
-}
-
-function stanceKind(stance){
-  const s = String(stance || "NO_TRADE").toUpperCase();
-  if (s === "LONG" || s === "BUY") return "bull";
-  if (s === "SHORT" || s === "SELL") return "bear";
-  return "wait";
-}
-
-function autoTag(stance){
-  const s = String(stance || "NO_TRADE").toUpperCase();
-  if (s === "LONG" || s === "BUY") return "BULLISH BIAS";
-  if (s === "SHORT" || s === "SELL") return "BEARISH BIAS";
-  return "WAIT / NO EDGE";
-}
-
-function stancePill(stance, confidence){
-  const s = String(stance || "NO_TRADE").toUpperCase();
-  const conf = (typeof confidence === "number") ? confidence : null;
-  const pct = (conf === null) ? "—" : `${Math.round(conf * 100)}%`;
-  const label = `${s} · ${pct}`;
-  const kind = (s === "LONG" || s === "BUY") ? "good" : (s === "SHORT" || s === "SELL") ? "bad" : "neutral";
-  return { label, kind, raw: conf };
-}
-
-function setPill(kind, text){
-  const pill = document.getElementById("statusPill");
-  pill.classList.remove("good","bad","neutral");
-  pill.classList.add(kind);
-  pill.textContent = text;
-}
-
-function decisionKind(action) {
-  const a = String(action || "").toUpperCase();
-  if (a === "BUY" || a === "LONG") return "bull";
-  if (a === "SELL" || a === "SHORT") return "bear";
-  if (a === "NO_TRADE" || a === "WAIT" || a === "HOLD") return "wait";
-  return "risk";
-}
-
-function renderProtocol(protocol){
-  const box = document.getElementById("protocolBox");
-  if (!protocol) { box.textContent = "—"; return; }
-
-  const r = Array.isArray(protocol.rounds) ? protocol.rounds : [];
-  const dis = Array.isArray(protocol.disagreements) ? protocol.disagreements : [];
-  const gates = Array.isArray(protocol.riskGates) ? protocol.riskGates : [];
-  const vote = (r.find(x => x.round === 3) || {}).vote || null;
-
-  const gatesHtml = gates.length ? `
-    <details class="reasoning" open>
-      <summary><span>Risk Gates</span><span class="chev">▼</span></summary>
-      <ul>${gates.map(g => `<li><strong>${g.pass ? "PASS" : "FAIL"}</strong> · ${g.gate} — ${g.details || ""}</li>`).join("")}</ul>
-    </details>` : "";
-
-  const disHtml = dis.length ? `
-    <details class="reasoning" ${dis.length ? "" : "open"}>
-      <summary><span>Disagreements</span><span class="chev">▼</span></summary>
-      <ul>${dis.map(d => `<li><strong>${d.topic}</strong> — for: ${(d.for||[]).join(", ")} · against: ${(d.against||[]).join(", ")} · impact: ${d.impact || ""}</li>`).join("")}</ul>
-    </details>` : "";
-
-  const voteHtml = vote ? `
-    <details class="reasoning" open>
-      <summary><span>Vote</span><span class="chev">▼</span></summary>
-      <ul>
-        <li><strong>Winner</strong>: ${vote.winner || "—"}</li>
-        <li><strong>Tally</strong>: LONG ${fmt(vote.tally?.LONG)} · SHORT ${fmt(vote.tally?.SHORT)} · NO_TRADE ${fmt(vote.tally?.NO_TRADE)}</li>
-      </ul>
-    </details>` : "";
-
-  const roundsLine = r.length ? `Rounds: ${r.map(x => x.round).join(" → ")}` : "—";
-  box.innerHTML = `<div style="margin-bottom:8px; color: var(--muted);">${roundsLine}</div>${voteHtml}${gatesHtml}${disHtml}`;
-}
-
-function render(data){
-  const meta = data?.meta || {};
-  const ctx = data?.context || {};
-  const dec = data?.decision || {};
-  const agents = Array.isArray(data?.agents) ? data.agents : [];
-
-  document.getElementById("pageTitle").textContent = meta.title || "Trade Senate";
-  const statusText = document.getElementById("statusPill")?.textContent || "";
-  document.getElementById("pageMeta").textContent = `${statusText} · v${meta.schemaVersion || "?"} · seq ${meta.sequence ?? "?"} · ${meta.generatedAt || "?"}`;
-
-  // Context KV
-  const contextKV = document.getElementById("contextKV");
-  contextKV.innerHTML = "";
-  const ctxRows = [
-    ["Symbol", ctx.symbol],
-    ["Timeframe", ctx.timeframe],
-    ["Last Price", ctx.lastPrice],
-    ["Session", ctx.session],
-    ["HTF Bias", ctx.htfBias],
-    ["Volatility", ctx.volatility],
-    ["PDH", ctx.pdh],
-    ["PDL", ctx.pdl],
-    ["Active FVGs", ctx.activeFvgs]
-  ];
-  for (const [k,v] of ctxRows){
-    const kEl = document.createElement("div"); kEl.className="k"; kEl.textContent=k;
-    const vEl = document.createElement("div"); vEl.className="v"; vEl.textContent=fmt(v);
-    contextKV.appendChild(kEl); contextKV.appendChild(vEl);
+  // ----- Helpers -----
+  function fmt(v){
+    if (v === null || v === undefined) return "—";
+    if (typeof v === "number") return (Math.abs(v) >= 1000 ? v.toFixed(0) : v.toString());
+    if (Array.isArray(v)) return v.length ? v.join(", ") : "—";
+    return String(v);
   }
 
-  // Anchors
-  const metaKV = document.getElementById("metaKV");
-  metaKV.innerHTML = "";
-  const metaRows = [
-    ["State hash", meta.stateHash ? `<code>${meta.stateHash}</code>` : "—"],
-    ["Sequence", meta.sequence],
-    ["Generated", meta.generatedAt]
-  ];
-  for (const [k,v] of metaRows){
-    const kEl = document.createElement("div"); kEl.className="k"; kEl.textContent=k;
-    const vEl = document.createElement("div"); vEl.className="v";
-    if (typeof v === "string" && v.includes("<code>")) vEl.innerHTML = v; else vEl.textContent = fmt(v);
-    metaKV.appendChild(kEl); metaKV.appendChild(vEl);
+  function stanceKind(stance){
+    const s = String(stance || "NO_TRADE").toUpperCase();
+    if (s === "LONG") return "bull";
+    if (s === "SHORT") return "bear";
+    return "risk";
   }
 
-  // Protocol panel
-  renderProtocol(data?.protocol);
+  function stanceBadge(stance, confidence){
+    const s = String(stance || "NO_TRADE").toUpperCase();
+    const pct = (typeof confidence === "number") ? Math.round(confidence * 100) : 0;
+    return `${s} · ${pct}%`;
+  }
 
-  // Agents list (flat latest stances)
-  const agentsList = document.getElementById("agentsList");
-  agentsList.innerHTML = "";
-  for (const a of agents){
-    const kind = stanceKind(a.stance);
-    const pill = stancePill(a.stance, a.confidence);
+  function setPill(el, kind, text){
+    el.classList.remove("good","bad","warn","live");
+    if (kind) el.classList.add(kind);
+    el.textContent = text;
+  }
 
-    const wrap = document.createElement("div");
-    wrap.className = "agent";
+  function heroClassFor(action){
+    const a = String(action || "NO_TRADE").toUpperCase();
+    if (a === "LONG") return "hero-bull";
+    if (a === "SHORT") return "hero-bear";
+    return "hero-warn";
+  }
 
-    const top = document.createElement("div");
-    top.className = "agentTop";
+  function scoreClass(x){
+    if (x > 0) return "scorePos";
+    if (x < 0) return "scoreNeg";
+    return "scoreZero";
+  }
 
-    const left = document.createElement("div");
-    left.className = "agentLeft";
+  function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
 
-    const avatar = document.createElement("div");
-    avatar.className = "avatar " + kind;
-    avatar.textContent = (kind === "bull") ? "▲" : (kind === "bear") ? "▼" : "●";
+  // ----- Render -----
+  function render(data){
+    // Top
+    const meta = data.meta || {};
+    const ctx = data.context || {};
+    document.getElementById("topTitle").textContent = meta.title || "Trade Senate";
+    document.getElementById("topSub").textContent = `LIVE JSON · v${fmt(meta.schemaVersion)} · seq ${fmt(meta.sequence)} · ${fmt(meta.generatedAt)}`;
 
-    const nameRole = document.createElement("div");
-    nameRole.innerHTML = `<div class="agentName">${a.name || "Agent"}</div><div class="agentRole">${a.role || ""}</div>`;
+    // Context rows
+    const ctxRows = [
+      ["Symbol", ctx.symbol],
+      ["Timeframe", ctx.timeframe],
+      ["Last Price", ctx.lastPrice],
+      ["Session", ctx.session],
+      ["HTF Bias", ctx.htfBias],
+      ["Volatility", ctx.volatility],
+      ["PDH", ctx.pdh],
+      ["PDL", ctx.pdl],
+      ["Active FVGs", ctx.activeFvgs],
+    ];
+    const ctxEl = document.getElementById("ctxRows");
+    ctxEl.innerHTML = ctxRows.map(([k,v]) => `
+      <div class="row">
+        <div class="k">${k}</div>
+        <div class="v">${fmt(v)}</div>
+      </div>
+    `).join("");
 
-    left.appendChild(avatar);
-    left.appendChild(nameRole);
+    // Anchors
+    const anchorEl = document.getElementById("anchorRows");
+    anchorEl.innerHTML = `
+      <div class="row"><div class="k">State hash</div><div class="v">${fmt(meta.stateHash)}</div></div>
+      <div class="row"><div class="k">Sequence</div><div class="v">${fmt(meta.sequence)}</div></div>
+      <div class="row"><div class="k">Generated</div><div class="v">${fmt(meta.generatedAt)}</div></div>
+    `;
 
-    const stance = document.createElement("span");
-    stance.className = "pill " + pill.kind;
-    stance.textContent = pill.label;
-    if (typeof pill.raw === "number") stance.title = `confidence_raw=${pill.raw.toFixed(4)}`;
+    // Pills
+    const pillState = document.getElementById("pillState");
+    setPill(pillState, "live", fmt(meta.stateHash || "LIVE"));
 
-    top.appendChild(left);
-    top.appendChild(stance);
+    // Senators
+    const senEl = document.getElementById("senators");
+    const agents = (data.agents || []).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+    senEl.innerHTML = agents.map(a => {
+      const kind = stanceKind(a.stance);
+      const initials = String(a.name || "A").trim().slice(0,1).toUpperCase();
+      const badge = stanceBadge(a.stance, a.confidence);
+      const claim = a.summary ? `<div class="claim">Claim: ${a.summary}</div>` : "";
+      const paras = (a.paragraphs || []).map(p => `<div class="p">• ${p}</div>`).join("");
+      const reasoning = (a.reasoning && a.reasoning.length) ? `
+        <details open>
+          <summary>Reasoning (evidence) <span class="chev">▾</span></summary>
+          <div class="inner">
+            <ul>${a.reasoning.map(r=>`<li>${r}</li>`).join("")}</ul>
+          </div>
+        </details>
+      ` : "";
+      return `
+        <div class="senator ${kind}">
+          <div class="s-hd">
+            <div class="s-left">
+              <div class="avatar">${initials}</div>
+              <div>
+                <div class="nm">${fmt(a.name)}</div>
+                <div class="rl">${fmt(a.role)}</div>
+              </div>
+            </div>
+            <div class="tagline">${badge}</div>
+          </div>
+          ${claim}
+          ${paras}
+          ${reasoning}
+        </div>
+      `;
+    }).join("");
 
-    const claim = document.createElement("div");
-    claim.className = "claim " + (kind === "wait" ? "wait" : kind);
-    claim.innerHTML = `<strong>Claim:</strong> ${a.summary || "—"}`;
+    // Decision
+    const dec = data.decision || {};
+    const decAction = String(dec.action || "NO_TRADE").toUpperCase();
+    const hero = document.getElementById("decisionHero");
+    hero.classList.remove("hero-bull","hero-bear","hero-warn");
+    hero.classList.add(heroClassFor(decAction));
+    document.getElementById("decAction").textContent = decAction;
+    const reason = [dec.reason, dec.nextCheck ? `· Next: ${dec.nextCheck}` : ""].filter(Boolean).join(" ");
+    document.getElementById("decReason").textContent = reason || "—";
+    document.getElementById("decRule").textContent = dec.rule ? `Arbiter constitution: ${dec.rule}` : "—";
+    setPill(document.getElementById("pillDecision"), (decAction==="LONG"?"good":decAction==="SHORT"?"bad":"warn"), decAction);
 
-    const details = document.createElement("details");
-    details.className = "reasoning";
-    details.open = true;
+    // Scorecard
+    const sc = data.scorecard || {};
+    const crit = sc.criteria || [];
+    const scoreRows = document.getElementById("scoreRows");
+    scoreRows.innerHTML = crit.map(r => `
+      <tr>
+        <td>${fmt(r.label || r.key)}</td>
+        <td>${fmt(r.agent)}</td>
+        <td class="${scoreClass(Number(r.score||0))}">${fmt(r.score)}</td>
+        <td>${fmt(r.weight)}</td>
+        <td style="color:rgba(231,238,247,.70)">${fmt(r.note)}</td>
+      </tr>
+    `).join("");
 
-    const summary = document.createElement("summary");
-    summary.innerHTML = `<span>Reasoning <span style="opacity:.7;font-weight:900">(evidence)</span></span><span class="chev">▼</span>`;
-    details.appendChild(summary);
+    // Gate
+    const gateBox = document.getElementById("gateBox");
+    const gate = (sc.summary && sc.summary.gate) ? sc.summary.gate : { passed:true, reason:"—" };
+    gateBox.classList.remove("pass","fail");
+    gateBox.classList.add(gate.passed ? "pass" : "fail");
+    document.getElementById("gateVal").textContent = gate.passed ? "PASS" : "FAIL";
+    document.getElementById("gateReason").textContent = gate.reason || "—";
 
-    const reasons = Array.isArray(a.reasoning) ? a.reasoning : (a.reasoning ? [String(a.reasoning)] : []);
-    if (reasons.length){
-      const ul = document.createElement("ul");
-      ul.innerHTML = reasons.map(r => `<li>${r}</li>`).join("");
-      details.appendChild(ul);
-    } else {
-      const empty = document.createElement("div");
-      empty.style.marginTop = "8px";
-      empty.style.color = "var(--muted)";
-      empty.textContent = "—";
-      details.appendChild(empty);
+    // Ensemble bar
+    const ens = data.ensemble || {};
+    const ensScore = (typeof ens.score === "number") ? ens.score : 0;
+    document.getElementById("ensScore").textContent = `score: ${ensScore.toFixed(4)} (raw ${fmt(ens.rawScore)})`;
+    const pillEns = document.getElementById("pillEnsemble");
+    const ensRes = String(ens.result || "NO_TRADE").toUpperCase();
+    setPill(pillEns, (ensRes==="LONG"?"good":ensRes==="SHORT"?"bad":"warn"), `Ensemble: ${ensRes}`);
+    // Map score to bar: clamp [-1,1] then map to [0,100]
+    const pos = (clamp(ensScore, -1, 1) + 1) * 50;
+    document.getElementById("ensNeedle").style.left = `${pos}%`;
+
+    // Protocol / rounds
+    const protocol = data.protocol || {};
+    const rounds = protocol.rounds || [];
+    const tabs = document.getElementById("roundTabs");
+    const transcript = document.getElementById("transcript");
+    if (!rounds.length){
+      tabs.innerHTML = "";
+      transcript.innerHTML = `<div class="turn"><div class="who">No protocol rounds in JSON</div><div class="txt">Add <code>protocol.rounds[]</code> to debate.json.</div></div>`;
+      return;
     }
 
-    const tag = document.createElement("div");
-    tag.className = "tag";
-    tag.textContent = (a.tag && String(a.tag).trim()) ? String(a.tag).trim() : autoTag(a.stance);
+    function renderRound(r){
+      const turns = r.turns || [];
+      // Final vote block
+      let extra = "";
+      if (r.final && r.final.vote){
+        const v = r.final.vote;
+        extra = `
+          <div class="turn">
+            <div class="who">
+              <div>Final Vote</div>
+              <div class="meta">result: ${fmt(v.result)} · score: ${fmt(v.score)}</div>
+            </div>
+            <div class="txt">Method: ${fmt(v.method)} · Threshold: ${fmt(v.threshold)} · Gate applied: ${fmt(v.gateApplied)}</div>
+          </div>
+        `;
+      }
 
-    wrap.appendChild(top);
-    wrap.appendChild(claim);
-    wrap.appendChild(details);
-    wrap.appendChild(tag);
-    agentsList.appendChild(wrap);
+      transcript.innerHTML = (turns.map(t => {
+        const who = t.speaker || "—";
+        const role = t.role || "";
+        const meta = (t.type ? t.type : (t.stance ? `${t.stance} · ${Math.round((t.confidence||0)*100)}%` : ""));
+        const text = t.text || t.claim || "";
+        const evidence = (t.evidence && t.evidence.length) ? `<div class="mini">Evidence: ${t.evidence.map(e=>`• ${e}`).join(" ")}</div>` : "";
+        return `
+          <div class="turn">
+            <div class="who">
+              <div>${who}</div>
+              <div class="meta">${fmt(role)} ${meta ? "· " + meta : ""}</div>
+            </div>
+            <div class="txt">${fmt(text)}</div>
+            ${evidence}
+          </div>
+        `;
+      }).join("")) + extra;
+    }
+
+    // Tabs
+    const activeId = rounds[0].id;
+    tabs.innerHTML = rounds.map((r,i)=>`<button class="tab ${i===0?"active":""}" data-id="${r.id}">${r.label || r.id}</button>`).join("");
+    renderRound(rounds[0]);
+
+    tabs.querySelectorAll(".tab").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        tabs.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        const id = btn.getAttribute("data-id");
+        const r = rounds.find(x=>x.id===id) || rounds[0];
+        renderRound(r);
+      });
+    });
   }
 
-  // Decision KV
-  const decisionKV = document.getElementById("decisionKV");
-  decisionKV.innerHTML = "";
-  const decRows = [["Action", dec.action], ["Next Check", dec.nextCheck]];
-  for (const [k,v] of decRows){
-    const kEl = document.createElement("div"); kEl.className="k"; kEl.textContent=k;
-    const vEl = document.createElement("div"); vEl.className="v"; vEl.textContent=fmt(v);
-    decisionKV.appendChild(kEl); decisionKV.appendChild(vEl);
+  async function load(){
+    try{
+      if (window.location.protocol === "file:") throw new Error("file:// protocol");
+      const url = `../STATE/debate.json?ts=${Date.now()}`;
+      const res = await fetch(url, { cache:"no-store", headers: { "Pragma": "no-cache" } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setPill(document.getElementById("pillLive"), "live", "LIVE JSON");
+      return data;
+    } catch (e){
+      console.warn("Using DEMO data:", e);
+      setPill(document.getElementById("pillLive"), "warn", "DEMO");
+      return DEMO;
+    }
   }
 
-  // Decision hero border class
-  const hero = document.getElementById("decisionHero");
-  const heroKind = decisionKind(dec.action);
-  hero.classList.remove("bull","bear","wait","risk");
-  hero.classList.add(heroKind);
-
-  const action = (dec.action || "").trim();
-  const reason = (dec.reason || "").trim();
-  const rule = (dec.rule || "").trim();
-  if (action || reason || rule){
-    hero.hidden = false;
-    document.getElementById("decisionAction").textContent = action || "—";
-    document.getElementById("decisionReason").textContent = [reason, dec.nextCheck ? `Next: ${dec.nextCheck}` : ""].filter(Boolean).join(" · ");
-    document.getElementById("decisionRule").textContent = rule ? `Arbiter constitution: ${rule}` : "";
-  } else {
-    hero.hidden = true;
-  }
-}
-
-async function loadOnce(){
-  const url = "../STATE/debate.json?ts=" + Date.now();
-  try{
-    if (window.location.protocol === "file:") throw new Error("file:// protocol");
-    const res = await fetch(url, { cache: "no-store", headers: { "Pragma": "no-cache" } });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const data = await res.json();
-    setPill("good","LIVE JSON");
+  async function refresh(){
+    const data = await load();
     render(data);
-  } catch(e){
-    setPill("neutral","OFFLINE DEMO");
-    render(DEMO);
   }
-}
 
-document.getElementById("btnRefresh").addEventListener("click", loadOnce);
-if (window.location.protocol !== "file:") setInterval(loadOnce, 3000);
-loadOnce();
+  document.getElementById("btnRefresh").addEventListener("click", refresh);
+  if (window.location.protocol !== "file:"){
+    setInterval(refresh, 3000);
+  }
+  refresh();
 </script>
 </body>
 </html>
