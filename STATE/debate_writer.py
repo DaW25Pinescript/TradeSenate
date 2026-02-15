@@ -67,6 +67,62 @@ def clamp(x: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, x))
 
 
+def validate_debate_payload(payload: Dict[str, Any]) -> List[str]:
+    """
+    Lightweight schema checks for debate.json.
+    Returns a list of validation error messages (empty list means valid).
+    """
+    errors: List[str] = []
+
+    def _expect_dict(key: str) -> Optional[Dict[str, Any]]:
+        value = payload.get(key)
+        if not isinstance(value, dict):
+            errors.append(f"'{key}' must be an object")
+            return None
+        return value
+
+    meta = _expect_dict("meta")
+    context = _expect_dict("context")
+    decision = _expect_dict("decision")
+    scorecard = _expect_dict("scorecard")
+    ensemble = _expect_dict("ensemble")
+    protocol = _expect_dict("protocol")
+
+    agents = payload.get("agents")
+    if not isinstance(agents, list) or not agents:
+        errors.append("'agents' must be a non-empty array")
+
+    if meta:
+        for k in ("schemaVersion", "generatedAt", "stateHash", "sequence"):
+            if k not in meta:
+                errors.append(f"'meta.{k}' is required")
+
+    if context:
+        for k in ("symbol", "timeframe", "htfBias", "volatility"):
+            if k not in context:
+                errors.append(f"'context.{k}' is required")
+
+    if decision:
+        for k in ("action", "reason", "rule"):
+            if k not in decision:
+                errors.append(f"'decision.{k}' is required")
+
+    if scorecard and not isinstance(scorecard.get("criteria"), list):
+        errors.append("'scorecard.criteria' must be an array")
+
+    if ensemble:
+        for k in ("result", "score", "threshold"):
+            if k not in ensemble:
+                errors.append(f"'ensemble.{k}' is required")
+
+    if protocol:
+        rounds = protocol.get("rounds")
+        if not isinstance(rounds, list) or len(rounds) < 3:
+            errors.append("'protocol.rounds' must be an array with at least 3 rounds")
+
+    return errors
+
+
 # -----------------------------------------------------------------------------
 # Core types
 # -----------------------------------------------------------------------------
@@ -516,6 +572,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Write STATE/debate.json for the UI (stub v1.2).")
     ap.add_argument("--state", default=DEFAULT_STATE_PATH, help="Path to canonical_state.json")
     ap.add_argument("--out", default=DEFAULT_DEBATE_PATH, help="Output path for debate.json")
+    ap.add_argument("--sequence", type=int, default=None, help="Optional deterministic sequence id")
+    ap.add_argument("--validate", action="store_true", help="Validate payload shape before writing")
     args = ap.parse_args()
 
     # Load canonical_state.json if present, else fallback minimal
@@ -524,8 +582,17 @@ def main() -> int:
     if not isinstance(state, dict):
         state = {}
 
-    sequence = int(time.time())
+    sequence = int(args.sequence) if args.sequence is not None else int(time.time())
     payload = build_debate_json_from_state(state, sequence=sequence)
+
+    if args.validate:
+        errors = validate_debate_payload(payload)
+        if errors:
+            print("Validation failed:")
+            for err in errors:
+                print(f"- {err}")
+            return 2
+
     atomic_write_json(args.out, payload)
     print(f"Wrote {args.out}")
     return 0
