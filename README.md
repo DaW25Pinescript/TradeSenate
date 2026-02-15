@@ -1,0 +1,2 @@
+# TradeSenate
+Trade decision
