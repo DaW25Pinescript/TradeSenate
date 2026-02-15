@@ -205,3 +205,18 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# --- runtime outputs ---
+STATE/debate.json
+STATE/canonical_state.json
+*.log
+
+# --- python ---
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db

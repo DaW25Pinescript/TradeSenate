@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trade Senate</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0b0f14; color:#e8eef7; }
+    header { padding: 16px 20px; border-bottom: 1px solid #1c2633; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .title { font-size: 18px; font-weight: 700; letter-spacing: .3px; }
+    .meta { font-size: 12px; color:#9db0c7; }
+    main { display:grid; grid-template-columns: 1.1fr 1.2fr 1.3fr; gap: 14px; padding: 14px; }
+    .card { background:#0f1621; border:1px solid #1c2633; border-radius: 12px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+    h2 { margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: .12em; color:#b8c7da; }
+    .kv { display:grid; grid-template-columns: 140px 1fr; gap: 8px 10px; font-size: 13px; }
+    .k { color:#9db0c7; }
+    .v { color:#e8eef7; }
+    .pill { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius: 999px; border: 1px solid #263245; font-size: 12px; }
+    .good { border-color:#1f6f3f; color:#bff1d0; background: rgba(31,111,63,.18); }
+    .bad  { border-color:#7a2b2b; color:#ffd0d0; background: rgba(122,43,43,.18); }
+    .warn { border-color:#7a6b2b; color:#ffeaa6; background: rgba(122,107,43,.18); }
+    .agent { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #253246; }
+    .agentTop { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .agentName { font-weight: 700; }
+    .agentRole { font-size: 12px; color:#9db0c7; }
+    .agentBody { margin-top: 8px; font-size: 13px; color:#d9e4f2; line-height: 1.4; }
+    ul { margin: 8px 0 0 18px; padding: 0; }
+    li { margin: 4px 0; }
+    footer { padding: 12px 14px; color:#9db0c7; font-size: 12px; }
+    .row { display:flex; gap:10px; flex-wrap: wrap; }
+    .btn { cursor:pointer; border-radius: 10px; border:1px solid #263245; padding: 8px 10px; background:#0b0f14; color:#e8eef7; font-size: 12px; }
+    .btn:hover { border-color:#3a4a63; }
+    code { background:#0b0f14; padding: 2px 6px; border-radius: 6px; border:1px solid #1c2633; }
+    @media (max-width: 1100px){ main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="title" id="pageTitle">Trade Senate</div>
+      <div class="meta" id="pageMeta">Loading…</div>
+    </div>
+    <div class="row">
+      <button class="btn" id="btnRefresh">Refresh</button>
+      <span class="pill warn" id="statusPill">WAITING</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="contextCard">
+      <h2>Context</h2>
+      <div class="kv" id="contextKV"></div>
+    </section>
+
+    <section class="card" id="agentsCard">
+      <h2>Senators</h2>
+      <div id="agentsList"></div>
+    </section>
+
+    <section class="card" id="decisionCard">
+      <h2>Decision</h2>
+      <div class="kv" id="decisionKV"></div>
+      <div class="agentBody" id="decisionReason" style="margin-top:10px;"></div>
+      <div class="agentBody" id="decisionRule" style="margin-top:10px;"></div>
+    </section>
+  </main>
+
+  <footer>
+    UI reads <code>../STATE/debate.json</code> every refresh. If missing, it falls back to embedded demo data.
+  </footer>
+
+<script>
+const DEMO = {
+  meta: { schemaVersion: "1.0", title: "Trade Senate Demo", generatedAt: new Date().toISOString(), stateHash: "demo", sequence: 1 },
+  context: { symbol: "EURUSD", timeframe: "M15", lastPrice: 1.0842, session: "London", htfBias: "Bullish", volatility: "Normal", pdh: 1.0871, pdl: 1.0798, activeFvgs: ["1.0820–1.0830"] },
+  agents: [
+    { name: "Magnus", role: "Chief of Staff", stance: "NO_TRADE", summary: "No-trade until BOS aligns with HTF bias.", paragraphs: ["Conflicting signals. Wait for clean break/retest."], reasoning: ["HTF bias bullish but LTF structure not confirmed."], confidence: 0.62 },
+    { name: "Atlas", role: "Technical Analyst", stance: "LONG", summary: "Trendline support holding; higher lows.", paragraphs: ["Price respecting ascending support; risk defined below swing."], reasoning: ["2 touches + clean reaction; PDH magnet overhead."], confidence: 0.58 },
+    { name: "Vela", role: "Price Action Analyst", stance: "NO_TRADE", summary: "Needs MSS→BOS confirmation.", paragraphs: ["Market is ranging; wait for displacement + BOS."], reasoning: ["No clean MSS; pivots overlapping."], confidence: 0.66 },
+    { name: "Nyx", role: "News/Sentiment", stance: "NO_TRADE", summary: "No strong catalyst; headlines neutral.", paragraphs: ["Nothing high-impact imminent in the next hour."], reasoning: ["Sentiment flat; risk of chop."], confidence: 0.55 }
+  ],
+  decision: { action: "NO_TRADE", reason: "Await MSS/BOS confirmation in direction of HTF bias.", nextCheck: "Next 1–2 candles", rule: "Let the market come to you." }
+};
+
+function fmt(v){
+  if (v === null || v === undefined) return "—";
+  if (typeof v === "number") return (Math.abs(v) >= 1000 ? v.toFixed(0) : v.toString());
+  if (Array.isArray(v)) return v.length ? v.join(", ") : "—";
+  return String(v);
+}
+
+function setPill(kind, text){
+  const pill = document.getElementById("statusPill");
+  pill.classList.remove("good","bad","warn");
+  pill.classList.add(kind);
+  pill.textContent = text;
+}
+
+function render(data){
+  document.getElementById("pageTitle").textContent = data?.meta?.title || "Trade Senate";
+  document.getElementById("pageMeta").textContent = `v${data?.meta?.schemaVersion || "?"} · seq ${data?.meta?.sequence ?? "?"} · ${data?.meta?.generatedAt || "?"}`;
+
+  // context
+  const ctx = data.context || {};
+  const contextKV = document.getElementById("contextKV");
+  contextKV.innerHTML = "";
+  const ctxRows = [
+    ["Symbol", ctx.symbol],
+    ["Timeframe", ctx.timeframe],
+    ["Last Price", ctx.lastPrice],
+    ["Session", ctx.session],
+    ["HTF Bias", ctx.htfBias],
+    ["Volatility", ctx.volatility],
+    ["PDH", ctx.pdh],
+    ["PDL", ctx.pdl],
+    ["Active FVGs", ctx.activeFvgs]
+  ];
+  for (const [k,v] of ctxRows){
+    const kEl = document.createElement("div"); kEl.className="k"; kEl.textContent=k;
+    const vEl = document.createElement("div"); vEl.className="v"; vEl.textContent=fmt(v);
+    contextKV.appendChild(kEl); contextKV.appendChild(vEl);
+  }
+
+  // agents
+  const agentsList = document.getElementById("agentsList");
+  agentsList.innerHTML = "";
+  const agents = Array.isArray(data.agents) ? data.agents : [];
+  for (const a of agents){
+    const wrap = document.createElement("div");
+    wrap.className = "agent";
+    const top = document.createElement("div");
+    top.className = "agentTop";
+    const left = document.createElement("div");
+    left.innerHTML = `<div class="agentName">${a.name || "Agent"}</div><div class="agentRole">${a.role || ""}</div>`;
+    const stance = document.createElement("span");
+    const s = (a.stance || "NO_TRADE").toUpperCase();
+    stance.className = "pill " + (s === "LONG" ? "good" : s === "SHORT" ? "bad" : "warn");
+    stance.textContent = `${s} · ${(a.confidence ?? 0).toFixed(2)}`;
+    top.appendChild(left); top.appendChild(stance);
+
+    const body = document.createElement("div");
+    body.className = "agentBody";
+    const paras = Array.isArray(a.paragraphs) ? a.paragraphs : (a.paragraphs ? [String(a.paragraphs)] : []);
+    const reasons = Array.isArray(a.reasoning) ? a.reasoning : (a.reasoning ? [String(a.reasoning)] : []);
+    body.innerHTML = `<div style="font-weight:600">${a.summary || ""}</div>` +
+      (paras.length ? `<div style="margin-top:6px">${paras.map(p=>`<div>• ${p}</div>`).join("")}</div>` : "") +
+      (reasons.length ? `<ul>${reasons.map(r=>`<li>${r}</li>`).join("")}</ul>` : "");
+    wrap.appendChild(top); wrap.appendChild(body);
+    agentsList.appendChild(wrap);
+  }
+
+  // decision
+  const dec = data.decision || {};
+  const decisionKV = document.getElementById("decisionKV");
+  decisionKV.innerHTML = "";
+  const decRows = [
+    ["Action", dec.action],
+    ["Next Check", dec.nextCheck]
+  ];
+  for (const [k,v] of decRows){
+    const kEl = document.createElement("div"); kEl.className="k"; kEl.textContent=k;
+    const vEl = document.createElement("div"); vEl.className="v"; vEl.textContent=fmt(v);
+    decisionKV.appendChild(kEl); decisionKV.appendChild(vEl);
+  }
+  document.getElementById("decisionReason").textContent = dec.reason ? `Reason: ${dec.reason}` : "";
+  document.getElementById("decisionRule").textContent = dec.rule ? `Rule: ${dec.rule}` : "";
+}
+
+async function loadOnce(){
+  const url = "../STATE/debate.json?ts=" + Date.now();
+  try{
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    setPill("good","LIVE");
+    render(data);
+  } catch(e){
+    setPill("warn","DEMO");
+    render(DEMO);
+  }
+}
+
+document.getElementById("btnRefresh").addEventListener("click", loadOnce);
+loadOnce();
+</script>
+</body>
+</html>
