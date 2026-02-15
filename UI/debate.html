@@ -10,7 +10,7 @@
       --bull: #10b981;
       --bear: #ef4444;
       --risk: #8b5cf6;
-      --neutral: #94a3b8;
+      --wait: #fbbf24;
 
       --bg: #0b0f14;
       --card: #0f1621;
@@ -26,277 +26,124 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      line-height: 1.45;
-    }
+    body { background: var(--bg); color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; line-height: 1.45; }
 
     header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      position: sticky;
-      top: 0;
-      background: rgba(11,15,20,.92);
-      backdrop-filter: blur(6px);
-      z-index: 10;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      position: sticky; top: 0; background: rgba(11,15,20,.92); backdrop-filter: blur(6px); z-index: 10;
     }
 
     .titleWrap { display:flex; flex-direction:column; gap:4px; }
-    .title {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: .2px;
-      display:flex;
-      align-items: baseline;
-      gap: 10px;
-    }
+    .title { font-size: 18px; font-weight: 900; letter-spacing: .2px; display:flex; gap:10px; align-items: baseline; }
     .subtitle { font-size: 12px; color: var(--muted); }
 
     .row { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
     .btn {
-      cursor:pointer;
-      border-radius: 12px;
-      border:1px solid var(--border2);
-      padding: 8px 10px;
-      background: var(--soft);
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 800;
+      cursor:pointer; border-radius: 12px; border:1px solid var(--border2);
+      padding: 8px 10px; background: var(--soft); color: var(--text);
+      font-size: 12px; font-weight: 900;
     }
     .btn:hover { border-color:#3a4a63; }
     .btn:active { transform: translateY(1px); }
 
     .pill {
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border2);
-      font-size: 12px;
-      font-weight: 800;
-      user-select:none;
-      white-space:nowrap;
+      display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius: 999px;
+      border: 1px solid var(--border2); font-size: 12px; font-weight: 900; user-select:none; white-space:nowrap;
     }
     .pill.good    { border-color:#1f6f3f; color:#bff1d0; background: rgba(31,111,63,.18); }
     .pill.bad     { border-color:#7a2b2b; color:#ffd0d0; background: rgba(122,43,43,.18); }
-    .pill.warn    { border-color:#7a6b2b; color:#ffeaa6; background: rgba(122,107,43,.18); }
     .pill.neutral { border-color:#3a4a63; color:#c8d6ea; background: rgba(58,74,99,.18); }
 
     .layout {
-      display:grid;
-      grid-template-columns: 1.05fr 1.15fr 1.35fr;
-      gap: 14px;
-      padding: 14px;
-      align-items:start;
+      display:grid; grid-template-columns: 1.05fr 1.15fr 1.35fr; gap: 14px; padding: 14px; align-items:start;
     }
-
-    .card {
-      background: var(--card);
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-      box-shadow: var(--shadow);
-    }
+    .card { background: var(--card); border:1px solid var(--border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); }
 
     h2 {
-      margin: 0 0 10px;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .14em;
-      color:#b8c7da;
-      display:flex;
-      align-items:center;
-      gap:8px;
+      margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color:#b8c7da;
+      display:flex; align-items:center; gap:8px;
     }
 
     .kv { display:grid; grid-template-columns: 140px 1fr; gap: 8px 10px; font-size: 13px; }
     .k { color: var(--muted); }
     .v { color: var(--text); font-weight: 650; }
 
-    code {
-      background: var(--soft);
-      padding: 2px 6px;
-      border-radius: 8px;
-      border:1px solid var(--border);
-      color: #d5e2f5;
-    }
+    code { background: var(--soft); padding: 2px 6px; border-radius: 8px; border:1px solid var(--border); color: #d5e2f5; }
 
     /* Agents */
-    .agent {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px dashed #253246;
-    }
-    .agentTop {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
+    .agent { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #253246; }
+    .agentTop { display:flex; align-items:center; justify-content:space-between; gap:10px; }
     .agentLeft { display:flex; align-items:center; gap:10px; }
 
     .avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 999px;
-      display:grid;
-      place-items:center;
-      font-weight: 900;
-      font-size: 16px;
-      border: 1px solid var(--border2);
-      background: #0b0f14;
-      flex: 0 0 auto;
+      width: 38px; height: 38px; border-radius: 999px; display:grid; place-items:center;
+      font-weight: 950; font-size: 16px; border: 1px solid var(--border2); background: #0b0f14; flex: 0 0 auto;
     }
     .avatar.bull { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.35); color: var(--bull); }
     .avatar.bear { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.35); color: var(--bear); }
     .avatar.risk { background: rgba(139,92,246,0.15); border-color: rgba(139,92,246,0.35); color: var(--risk); }
+    .avatar.wait { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.35); color: var(--wait); }
 
-    .agentName { font-weight: 900; }
+    .agentName { font-weight: 950; }
     .agentRole { font-size: 12px; color: var(--muted); margin-top:2px; }
 
-    .agentBody { margin-top: 10px; font-size: 13px; color:#d9e4f2; }
+    details.reasoning {
+      margin-top: 10px; border-radius: 12px; border: 1px solid var(--border);
+      background: rgba(148,163,184,0.06); padding: 10px 12px;
+    }
+    details.reasoning > summary {
+      list-style: none; cursor: pointer; display:flex; align-items:center; justify-content:space-between;
+      gap:10px; color: #c6d5ea; font-weight: 900; user-select:none;
+    }
+    details.reasoning > summary::-webkit-details-marker { display: none; }
+    .chev { display:inline-block; font-size: 12px; opacity: .9; transform: rotate(-90deg); transition: transform .16s ease; }
+    details.reasoning[open] .chev { transform: rotate(0deg); }
+    ul { margin: 8px 0 0 18px; padding: 0; }
+    li { margin: 6px 0; color: #d9e4f2; }
+
     .claim {
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(148,163,184,0.10);
-      border-left: 4px solid var(--neutral);
-      color: #dbe7f7;
-      font-weight: 650;
+      margin-top: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border);
+      background: rgba(148,163,184,0.10); border-left: 4px solid #94a3b8; color: #dbe7f7; font-weight: 700;
     }
     .claim.bull { border-left-color: var(--bull); }
     .claim.bear { border-left-color: var(--bear); }
     .claim.risk { border-left-color: var(--risk); }
-
-    .paras { margin-top: 8px; display:flex; flex-direction:column; gap:6px; }
-    .paras .p { display:flex; gap:8px; }
-    .dot { opacity:.8; }
-
-    details.reasoning {
-      margin-top: 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(148,163,184,0.06);
-      padding: 10px 12px;
-    }
-    details.reasoning > summary {
-      list-style: none;
-      cursor: pointer;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      color: #c6d5ea;
-      font-weight: 800;
-      user-select:none;
-    }
-    details.reasoning > summary::-webkit-details-marker { display: none; }
-    .chev {
-      display:inline-block;
-      font-size: 12px;
-      opacity: .9;
-      transform: rotate(-90deg);
-      transition: transform .16s ease;
-    }
-    details.reasoning[open] .chev { transform: rotate(0deg); }
-
-    ul { margin: 8px 0 0 18px; padding: 0; }
-    li { margin: 6px 0; color: #d9e4f2; }
+    .claim.wait { border-left-color: var(--wait); }
 
     .tag {
-      display:inline-flex;
-      margin-top: 10px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 900;
-      border:1px solid var(--border);
-      background: rgba(148,163,184,0.10);
-      color: #dbe7f7;
+      display:inline-flex; margin-top: 10px; padding: 4px 10px; border-radius: 999px;
+      font-size: 12px; font-weight: 950; border:1px solid var(--border); background: rgba(148,163,184,0.10); color: #dbe7f7;
     }
 
     /* Decision */
     .decisionHero {
       border-radius: var(--radius);
       padding: 16px;
-      border: 1px solid rgba(148,163,184,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
       background: linear-gradient(135deg, rgba(30,58,138,0.55), rgba(59,130,246,0.30));
       box-shadow: 0 10px 24px rgba(0,0,0,.25);
       transition: border-color .18s ease, box-shadow .18s ease;
     }
-    .decisionHero.bull {
-      border-color: rgba(16,185,129,0.55);
-      box-shadow: 0 10px 24px rgba(16,185,129,.10), 0 10px 24px rgba(0,0,0,.25);
-    }
-    .decisionHero.bear {
-      border-color: rgba(239,68,68,0.55);
-      box-shadow: 0 10px 24px rgba(239,68,68,.10), 0 10px 24px rgba(0,0,0,.25);
-    }
-    .decisionHero.risk {
-      border-color: rgba(58,74,99,0.65);
-      box-shadow: 0 10px 24px rgba(58,74,99,.14), 0 10px 24px rgba(0,0,0,.25);
-    }
+    .decisionHero.bull { border-color: rgba(16,185,129,0.55); box-shadow: 0 10px 24px rgba(16,185,129,.10), 0 10px 24px rgba(0,0,0,.25); }
+    .decisionHero.bear { border-color: rgba(239,68,68,0.55); box-shadow: 0 10px 24px rgba(239,68,68,.10), 0 10px 24px rgba(0,0,0,.25); }
+    .decisionHero.wait { border-color: rgba(251,191,36,0.65); box-shadow: 0 10px 24px rgba(251,191,36,.10), 0 10px 24px rgba(0,0,0,.25); }
+    .decisionHero.risk { border-color: rgba(139,92,246,0.55); box-shadow: 0 10px 24px rgba(139,92,246,.10), 0 10px 24px rgba(0,0,0,.25); }
 
-    .decisionTitle {
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      font-weight: 950;
-      letter-spacing: .2px;
-      opacity: .95;
-    }
-    .decisionAction {
-      text-align:center;
-      font-size: 28px;
-      font-weight: 950;
-      margin: 8px 0 6px;
-      letter-spacing: -0.5px;
-    }
-    .decisionReason {
-      text-align:center;
-      color: rgba(255,255,255,0.92);
-      font-weight: 650;
-      line-height: 1.45;
-    }
-    .decisionRule {
-      margin-top: 10px;
-      text-align:center;
-      opacity: .92;
-      font-style: italic;
-      font-weight: 650;
-    }
+    .decisionTitle { display:flex; align-items:center; justify-content:center; gap:8px; font-weight: 950; opacity: .95; }
+    .decisionAction { text-align:center; font-size: 28px; font-weight: 950; margin: 8px 0 6px; letter-spacing: -0.5px; }
+    .decisionReason { text-align:center; color: rgba(255,255,255,0.92); font-weight: 700; line-height: 1.45; }
+    .decisionRule { margin-top: 10px; text-align:center; opacity: .92; font-style: italic; font-weight: 700; }
 
-    /* Sticky right-side panels */
     .sticky { position: sticky; top: 76px; }
-
-    /* Responsive */
-    @media (max-width: 1100px){
-      .layout { grid-template-columns: 1fr; }
-      .sticky { position: static; top: auto; }
-    }
-
-    footer {
-      padding: 10px 14px;
-      color: var(--muted);
-      font-size: 12px;
-    }
+    @media (max-width: 1100px){ .layout { grid-template-columns: 1fr; } .sticky { position: static; top: auto; } }
   </style>
 </head>
 <body>
   <header>
     <div class="titleWrap">
-      <div class="title">
-        <span id="pageTitle">Trade Senate</span>
-      </div>
+      <div class="title"><span id="pageTitle">Trade Senate</span></div>
       <div class="subtitle" id="pageMeta">Loading…</div>
     </div>
     <div class="row">
@@ -306,7 +153,7 @@
   </header>
 
   <div class="layout">
-    <section class="card sticky" id="contextCard">
+    <section class="card sticky">
       <h2>Market Context</h2>
       <div class="kv" id="contextKV"></div>
 
@@ -314,19 +161,22 @@
         <h2>Anchors</h2>
         <div class="kv" id="metaKV"></div>
       </div>
+
+      <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+        <h2>Protocol</h2>
+        <div id="protocolBox" style="font-size:13px; color:#d9e4f2;"></div>
+      </div>
     </section>
 
-    <section class="card" id="agentsCard">
+    <section class="card">
       <h2>Senators</h2>
       <div id="agentsList"></div>
     </section>
 
-    <section class="card sticky" id="decisionCard">
+    <section class="card sticky">
       <h2>Decision</h2>
-      <div class="decisionHero" id="decisionHero" hidden>
-        <div class="decisionTitle">
-          <span>✓</span><span>Senate Decision</span>
-        </div>
+      <div class="decisionHero risk" id="decisionHero" hidden>
+        <div class="decisionTitle"><span>✓</span><span>Senate Decision</span></div>
         <div class="decisionAction" id="decisionAction">—</div>
         <div class="decisionReason" id="decisionReason"></div>
         <div class="decisionRule" id="decisionRule"></div>
@@ -336,21 +186,26 @@
     </section>
   </div>
 
-  <footer>
-    UI reads <code>../STATE/debate.json</code> every refresh. If missing/unreachable, it falls back to embedded DEMO data.
-  </footer>
-
 <script>
 const DEMO = {
-  meta: { schemaVersion: "1.0", title: "Trade Senate Demo", generatedAt: new Date().toISOString(), stateHash: "demo", sequence: 1 },
-  context: { symbol: "EURUSD", timeframe: "M15", lastPrice: 1.0842, session: "London", htfBias: "Bullish", volatility: "Normal", pdh: 1.0871, pdl: 1.0798, activeFvgs: ["1.0820–1.0830"] },
+  meta: { schemaVersion: "1.1", title: "Trade Senate Demo", generatedAt: new Date().toISOString(), stateHash: "demo", sequence: 1 },
+  context: { symbol: "BTCUSDT", timeframe: "1H", lastPrice: 48250.5, session: "NY", htfBias: "Bullish", volatility: "Normal", pdh: 48500.0, pdl: 47000.0, activeFvgs: ["48210–48280"] },
   agents: [
-    { name: "Magnus", role: "Chief of Staff", stance: "NO_TRADE", summary: "No-trade until BOS aligns with HTF bias.", paragraphs: ["Conflicting signals. Wait for clean break/retest."], reasoning: ["HTF bias bullish but LTF structure not confirmed."], confidence: 0.62 },
-    { name: "Atlas", role: "Technical Analyst", stance: "LONG", summary: "Trendline support holding; higher lows.", paragraphs: ["Price respecting ascending support; risk defined below swing."], reasoning: ["2 touches + clean reaction; PDH magnet overhead."], confidence: 0.58 },
-    { name: "Vela", role: "Price Action Analyst", stance: "NO_TRADE", summary: "Needs MSS→BOS confirmation.", paragraphs: ["Market is ranging; wait for displacement + BOS."], reasoning: ["No clean MSS; pivots overlapping."], confidence: 0.66 },
-    { name: "Nyx", role: "News/Sentiment", stance: "NO_TRADE", summary: "No strong catalyst; headlines neutral.", paragraphs: ["Nothing high-impact imminent in the next hour."], reasoning: ["Sentiment flat; risk of chop."], confidence: 0.55 }
+    { name: "Magnus", role: "Chief of Staff", stance: "NO_TRADE", summary: "No-trade until structure aligns with HTF bias.", reasoning: ["Await MSS/BOS confirmation."], confidence: 0.62 },
+    { name: "Atlas", role: "Technical Analyst", stance: "LONG", summary: "HTF bias bullish; prefer longs after confirmation.", reasoning: ["HTF bias = Bullish."], confidence: 0.58 },
+    { name: "Vela", role: "Price Action Analyst", stance: "NO_TRADE", summary: "Wait for MSS→BOS confirmation before taking risk.", reasoning: ["MSS=false, BOS=false"], confidence: 0.66 },
+    { name: "Nyx", role: "Risk Manager", stance: "NO_TRADE", summary: "Risk gate check: allow only if constraints pass.", reasoning: ["No debate around limits."], confidence: 0.80 }
   ],
-  decision: { action: "NO_TRADE", reason: "Await MSS/BOS confirmation in direction of HTF bias.", nextCheck: "Next 1–2 candles", rule: "Let the market come to you." }
+  decision: { action: "NO_TRADE", reason: "Await MSS/BOS confirmation. Consensus threshold not met.", nextCheck: "Next 1–2 candles", rule: "Let the market come to you." },
+  protocol: {
+    rounds: [
+      { round: 1, label: "Independent", turns: [] },
+      { round: 2, label: "Rebuttal", turns: [] },
+      { round: 3, label: "Vote", vote: { weights: {}, tally: {LONG:0.58, SHORT:0.0, NO_TRADE:0.66}, winner: "NO_TRADE" } }
+    ],
+    disagreements: [{ topic:"structure_confirmed", for:["Atlas"], against:["Vela","Magnus"], impact:"requires_confirmation"}],
+    riskGates: [{ gate:"structure_confirmed", pass:false, details:"MSS and BOS must be true for entries"}]
+  }
 };
 
 function fmt(v){
@@ -362,15 +217,15 @@ function fmt(v){
 
 function stanceKind(stance){
   const s = String(stance || "NO_TRADE").toUpperCase();
-  if (s === "LONG") return "bull";
-  if (s === "SHORT") return "bear";
-  return "risk";
+  if (s === "LONG" || s === "BUY") return "bull";
+  if (s === "SHORT" || s === "SELL") return "bear";
+  return "wait";
 }
 
 function autoTag(stance){
   const s = String(stance || "NO_TRADE").toUpperCase();
-  if (s === "LONG") return "BULLISH BIAS";
-  if (s === "SHORT") return "BEARISH BIAS";
+  if (s === "LONG" || s === "BUY") return "BULLISH BIAS";
+  if (s === "SHORT" || s === "SELL") return "BEARISH BIAS";
   return "WAIT / NO EDGE";
 }
 
@@ -379,27 +234,57 @@ function stancePill(stance, confidence){
   const conf = (typeof confidence === "number") ? confidence : null;
   const pct = (conf === null) ? "—" : `${Math.round(conf * 100)}%`;
   const label = `${s} · ${pct}`;
-
-  const kind =
-    (s === "LONG") ? "good" :
-    (s === "SHORT") ? "bad" :
-    "neutral";
-
+  const kind = (s === "LONG" || s === "BUY") ? "good" : (s === "SHORT" || s === "SELL") ? "bad" : "neutral";
   return { label, kind, raw: conf };
 }
 
 function setPill(kind, text){
   const pill = document.getElementById("statusPill");
-  pill.classList.remove("good","bad","warn","neutral");
+  pill.classList.remove("good","bad","neutral");
   pill.classList.add(kind);
   pill.textContent = text;
 }
 
-function decisionKind(action){
-  const a = String(action || "NO_TRADE").toUpperCase();
-  if (a === "LONG") return "bull";
-  if (a === "SHORT") return "bear";
+function decisionKind(action) {
+  const a = String(action || "").toUpperCase();
+  if (a === "BUY" || a === "LONG") return "bull";
+  if (a === "SELL" || a === "SHORT") return "bear";
+  if (a === "NO_TRADE" || a === "WAIT" || a === "HOLD") return "wait";
   return "risk";
+}
+
+function renderProtocol(protocol){
+  const box = document.getElementById("protocolBox");
+  if (!protocol) { box.textContent = "—"; return; }
+
+  const r = Array.isArray(protocol.rounds) ? protocol.rounds : [];
+  const dis = Array.isArray(protocol.disagreements) ? protocol.disagreements : [];
+  const gates = Array.isArray(protocol.riskGates) ? protocol.riskGates : [];
+  const vote = (r.find(x => x.round === 3) || {}).vote || null;
+
+  const gatesHtml = gates.length ? `
+    <details class="reasoning" open>
+      <summary><span>Risk Gates</span><span class="chev">▼</span></summary>
+      <ul>${gates.map(g => `<li><strong>${g.pass ? "PASS" : "FAIL"}</strong> · ${g.gate} — ${g.details || ""}</li>`).join("")}</ul>
+    </details>` : "";
+
+  const disHtml = dis.length ? `
+    <details class="reasoning" ${dis.length ? "" : "open"}>
+      <summary><span>Disagreements</span><span class="chev">▼</span></summary>
+      <ul>${dis.map(d => `<li><strong>${d.topic}</strong> — for: ${(d.for||[]).join(", ")} · against: ${(d.against||[]).join(", ")} · impact: ${d.impact || ""}</li>`).join("")}</ul>
+    </details>` : "";
+
+  const voteHtml = vote ? `
+    <details class="reasoning" open>
+      <summary><span>Vote</span><span class="chev">▼</span></summary>
+      <ul>
+        <li><strong>Winner</strong>: ${vote.winner || "—"}</li>
+        <li><strong>Tally</strong>: LONG ${fmt(vote.tally?.LONG)} · SHORT ${fmt(vote.tally?.SHORT)} · NO_TRADE ${fmt(vote.tally?.NO_TRADE)}</li>
+      </ul>
+    </details>` : "";
+
+  const roundsLine = r.length ? `Rounds: ${r.map(x => x.round).join(" → ")}` : "—";
+  box.innerHTML = `<div style="margin-bottom:8px; color: var(--muted);">${roundsLine}</div>${voteHtml}${gatesHtml}${disHtml}`;
 }
 
 function render(data){
@@ -409,10 +294,8 @@ function render(data){
   const agents = Array.isArray(data?.agents) ? data.agents : [];
 
   document.getElementById("pageTitle").textContent = meta.title || "Trade Senate";
-
   const statusText = document.getElementById("statusPill")?.textContent || "";
-  document.getElementById("pageMeta").textContent =
-    `${statusText} · v${meta.schemaVersion || "?"} · seq ${meta.sequence ?? "?"} · ${meta.generatedAt || "?"}`;
+  document.getElementById("pageMeta").textContent = `${statusText} · v${meta.schemaVersion || "?"} · seq ${meta.sequence ?? "?"} · ${meta.generatedAt || "?"}`;
 
   // Context KV
   const contextKV = document.getElementById("contextKV");
@@ -434,7 +317,7 @@ function render(data){
     contextKV.appendChild(kEl); contextKV.appendChild(vEl);
   }
 
-  // Anchors KV (anti-hallucination)
+  // Anchors
   const metaKV = document.getElementById("metaKV");
   metaKV.innerHTML = "";
   const metaRows = [
@@ -449,20 +332,19 @@ function render(data){
     metaKV.appendChild(kEl); metaKV.appendChild(vEl);
   }
 
-  // Agents
+  // Protocol panel
+  renderProtocol(data?.protocol);
+
+  // Agents list (flat latest stances)
   const agentsList = document.getElementById("agentsList");
   agentsList.innerHTML = "";
   for (const a of agents){
     const kind = stanceKind(a.stance);
     const pill = stancePill(a.stance, a.confidence);
 
-    const paras = Array.isArray(a.paragraphs) ? a.paragraphs : (a.paragraphs ? [String(a.paragraphs)] : []);
-    const reasons = Array.isArray(a.reasoning) ? a.reasoning : (a.reasoning ? [String(a.reasoning)] : []);
-
     const wrap = document.createElement("div");
     wrap.className = "agent";
 
-    // top row
     const top = document.createElement("div");
     top.className = "agentTop";
 
@@ -487,28 +369,19 @@ function render(data){
     top.appendChild(left);
     top.appendChild(stance);
 
-    // body
-    const body = document.createElement("div");
-    body.className = "agentBody";
-
     const claim = document.createElement("div");
-    claim.className = "claim " + kind;
+    claim.className = "claim " + (kind === "wait" ? "wait" : kind);
     claim.innerHTML = `<strong>Claim:</strong> ${a.summary || "—"}`;
-
-    const parasDiv = document.createElement("div");
-    parasDiv.className = "paras";
-    if (paras.length){
-      parasDiv.innerHTML = paras.map(p => `<div class="p"><span class="dot">•</span><span>${p}</span></div>`).join("");
-    }
 
     const details = document.createElement("details");
     details.className = "reasoning";
     details.open = true;
 
     const summary = document.createElement("summary");
-    summary.innerHTML = `<span>Reasoning <span style="opacity:.7;font-weight:800">(evidence)</span></span><span class="chev">▼</span>`;
+    summary.innerHTML = `<span>Reasoning <span style="opacity:.7;font-weight:900">(evidence)</span></span><span class="chev">▼</span>`;
     details.appendChild(summary);
 
+    const reasons = Array.isArray(a.reasoning) ? a.reasoning : (a.reasoning ? [String(a.reasoning)] : []);
     if (reasons.length){
       const ul = document.createElement("ul");
       ul.innerHTML = reasons.map(r => `<li>${r}</li>`).join("");
@@ -521,56 +394,43 @@ function render(data){
       details.appendChild(empty);
     }
 
-    const t = (a.tag && String(a.tag).trim()) ? String(a.tag).trim() : autoTag(a.stance);
     const tag = document.createElement("div");
     tag.className = "tag";
-    tag.textContent = t;
-
-    body.appendChild(claim);
-    if (paras.length) body.appendChild(parasDiv);
-    body.appendChild(details);
-    body.appendChild(tag);
+    tag.textContent = (a.tag && String(a.tag).trim()) ? String(a.tag).trim() : autoTag(a.stance);
 
     wrap.appendChild(top);
-    wrap.appendChild(body);
+    wrap.appendChild(claim);
+    wrap.appendChild(details);
+    wrap.appendChild(tag);
     agentsList.appendChild(wrap);
   }
 
   // Decision KV
   const decisionKV = document.getElementById("decisionKV");
   decisionKV.innerHTML = "";
-  const decRows = [
-    ["Action", dec.action],
-    ["Next Check", dec.nextCheck]
-  ];
+  const decRows = [["Action", dec.action], ["Next Check", dec.nextCheck]];
   for (const [k,v] of decRows){
     const kEl = document.createElement("div"); kEl.className="k"; kEl.textContent=k;
     const vEl = document.createElement("div"); vEl.className="v"; vEl.textContent=fmt(v);
     decisionKV.appendChild(kEl); decisionKV.appendChild(vEl);
   }
 
-  // Decision hero + border class
+  // Decision hero border class
   const hero = document.getElementById("decisionHero");
   const heroKind = decisionKind(dec.action);
+  hero.classList.remove("bull","bear","wait","risk");
+  hero.classList.add(heroKind);
 
   const action = (dec.action || "").trim();
   const reason = (dec.reason || "").trim();
   const rule = (dec.rule || "").trim();
-
-  hero.classList.remove("bull","bear","risk");
-  hero.classList.add(heroKind);
-
   if (action || reason || rule){
     hero.hidden = false;
     document.getElementById("decisionAction").textContent = action || "—";
-    document.getElementById("decisionReason").textContent =
-      [reason, dec.nextCheck ? `Next: ${dec.nextCheck}` : ""].filter(Boolean).join(" · ");
+    document.getElementById("decisionReason").textContent = [reason, dec.nextCheck ? `Next: ${dec.nextCheck}` : ""].filter(Boolean).join(" · ");
     document.getElementById("decisionRule").textContent = rule ? `Arbiter constitution: ${rule}` : "";
   } else {
     hero.hidden = true;
-    document.getElementById("decisionAction").textContent = "—";
-    document.getElementById("decisionReason").textContent = "";
-    document.getElementById("decisionRule").textContent = "";
   }
 }
 
@@ -590,10 +450,7 @@ async function loadOnce(){
 }
 
 document.getElementById("btnRefresh").addEventListener("click", loadOnce);
-
-// Auto-refresh every 3 seconds when served over http(s)
 if (window.location.protocol !== "file:") setInterval(loadOnce, 3000);
-
 loadOnce();
 </script>
 </body>
