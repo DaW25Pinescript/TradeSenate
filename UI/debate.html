@@ -5,52 +5,315 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Trade Senate</title>
   <style>
-    :root { color-scheme: dark; }
-    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0b0f14; color:#e8eef7; }
-    header { padding: 16px 20px; border-bottom: 1px solid #1c2633; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .title { font-size: 18px; font-weight: 700; letter-spacing: .3px; }
-    .meta { font-size: 12px; color:#9db0c7; }
-    main { display:grid; grid-template-columns: 1.1fr 1.2fr 1.3fr; gap: 14px; padding: 14px; }
-    .card { background:#0f1621; border:1px solid #1c2633; border-radius: 12px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.25); }
-    h2 { margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: .12em; color:#b8c7da; }
-    .kv { display:grid; grid-template-columns: 140px 1fr; gap: 8px 10px; font-size: 13px; }
-    .k { color:#9db0c7; }
-    .v { color:#e8eef7; }
-    .pill { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius: 999px; border: 1px solid #263245; font-size: 12px; }
-    .good { border-color:#1f6f3f; color:#bff1d0; background: rgba(31,111,63,.18); }
-    .bad  { border-color:#7a2b2b; color:#ffd0d0; background: rgba(122,43,43,.18); }
-    .warn { border-color:#7a6b2b; color:#ffeaa6; background: rgba(122,107,43,.18); }
-    .agent { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #253246; }
-    .agentTop { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .agentName { font-weight: 700; }
-    .agentRole { font-size: 12px; color:#9db0c7; }
-    .agentBody { margin-top: 8px; font-size: 13px; color:#d9e4f2; line-height: 1.4; }
-    ul { margin: 8px 0 0 18px; padding: 0; }
-    li { margin: 4px 0; }
-    footer { padding: 12px 14px; color:#9db0c7; font-size: 12px; }
-    .row { display:flex; gap:10px; flex-wrap: wrap; }
-    .btn { cursor:pointer; border-radius: 10px; border:1px solid #263245; padding: 8px 10px; background:#0b0f14; color:#e8eef7; font-size: 12px; }
+    :root {
+      color-scheme: dark;
+      --bull: #10b981;
+      --bear: #ef4444;
+      --risk: #8b5cf6;
+      --neutral: #94a3b8;
+
+      --bg: #0b0f14;
+      --card: #0f1621;
+      --border: #1c2633;
+      --border2: #263245;
+
+      --text: #e8eef7;
+      --muted: #9db0c7;
+      --soft: #0b0f14;
+
+      --shadow: 0 6px 18px rgba(0,0,0,.25);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      line-height: 1.45;
+    }
+
+    header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      position: sticky;
+      top: 0;
+      background: rgba(11,15,20,.92);
+      backdrop-filter: blur(6px);
+      z-index: 10;
+    }
+
+    .titleWrap { display:flex; flex-direction:column; gap:4px; }
+    .title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      display:flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .subtitle { font-size: 12px; color: var(--muted); }
+
+    .row { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
+    .btn {
+      cursor:pointer;
+      border-radius: 12px;
+      border:1px solid var(--border2);
+      padding: 8px 10px;
+      background: var(--soft);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+    }
     .btn:hover { border-color:#3a4a63; }
-    code { background:#0b0f14; padding: 2px 6px; border-radius: 6px; border:1px solid #1c2633; }
-    @media (max-width: 1100px){ main { grid-template-columns: 1fr; } }
+    .btn:active { transform: translateY(1px); }
+
+    .pill {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border2);
+      font-size: 12px;
+      font-weight: 800;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .pill.good    { border-color:#1f6f3f; color:#bff1d0; background: rgba(31,111,63,.18); }
+    .pill.bad     { border-color:#7a2b2b; color:#ffd0d0; background: rgba(122,43,43,.18); }
+    .pill.warn    { border-color:#7a6b2b; color:#ffeaa6; background: rgba(122,107,43,.18); }
+    .pill.neutral { border-color:#3a4a63; color:#c8d6ea; background: rgba(58,74,99,.18); }
+
+    .layout {
+      display:grid;
+      grid-template-columns: 1.05fr 1.15fr 1.35fr;
+      gap: 14px;
+      padding: 14px;
+      align-items:start;
+    }
+
+    .card {
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color:#b8c7da;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .kv { display:grid; grid-template-columns: 140px 1fr; gap: 8px 10px; font-size: 13px; }
+    .k { color: var(--muted); }
+    .v { color: var(--text); font-weight: 650; }
+
+    code {
+      background: var(--soft);
+      padding: 2px 6px;
+      border-radius: 8px;
+      border:1px solid var(--border);
+      color: #d5e2f5;
+    }
+
+    /* Agents */
+    .agent {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #253246;
+    }
+    .agentTop {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .agentLeft { display:flex; align-items:center; gap:10px; }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
+      font-weight: 900;
+      font-size: 16px;
+      border: 1px solid var(--border2);
+      background: #0b0f14;
+      flex: 0 0 auto;
+    }
+    .avatar.bull { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.35); color: var(--bull); }
+    .avatar.bear { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.35); color: var(--bear); }
+    .avatar.risk { background: rgba(139,92,246,0.15); border-color: rgba(139,92,246,0.35); color: var(--risk); }
+
+    .agentName { font-weight: 900; }
+    .agentRole { font-size: 12px; color: var(--muted); margin-top:2px; }
+
+    .agentBody { margin-top: 10px; font-size: 13px; color:#d9e4f2; }
+    .claim {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(148,163,184,0.10);
+      border-left: 4px solid var(--neutral);
+      color: #dbe7f7;
+      font-weight: 650;
+    }
+    .claim.bull { border-left-color: var(--bull); }
+    .claim.bear { border-left-color: var(--bear); }
+    .claim.risk { border-left-color: var(--risk); }
+
+    .paras { margin-top: 8px; display:flex; flex-direction:column; gap:6px; }
+    .paras .p { display:flex; gap:8px; }
+    .dot { opacity:.8; }
+
+    details.reasoning {
+      margin-top: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(148,163,184,0.06);
+      padding: 10px 12px;
+    }
+    details.reasoning > summary {
+      list-style: none;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      color: #c6d5ea;
+      font-weight: 800;
+      user-select:none;
+    }
+    details.reasoning > summary::-webkit-details-marker { display: none; }
+    .chev {
+      display:inline-block;
+      font-size: 12px;
+      opacity: .9;
+      transform: rotate(-90deg);
+      transition: transform .16s ease;
+    }
+    details.reasoning[open] .chev { transform: rotate(0deg); }
+
+    ul { margin: 8px 0 0 18px; padding: 0; }
+    li { margin: 6px 0; color: #d9e4f2; }
+
+    .tag {
+      display:inline-flex;
+      margin-top: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      border:1px solid var(--border);
+      background: rgba(148,163,184,0.10);
+      color: #dbe7f7;
+    }
+
+    /* Decision */
+    .decisionHero {
+      border-radius: var(--radius);
+      padding: 16px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: linear-gradient(135deg, rgba(30,58,138,0.55), rgba(59,130,246,0.30));
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .decisionHero.bull {
+      border-color: rgba(16,185,129,0.55);
+      box-shadow: 0 10px 24px rgba(16,185,129,.10), 0 10px 24px rgba(0,0,0,.25);
+    }
+    .decisionHero.bear {
+      border-color: rgba(239,68,68,0.55);
+      box-shadow: 0 10px 24px rgba(239,68,68,.10), 0 10px 24px rgba(0,0,0,.25);
+    }
+    .decisionHero.risk {
+      border-color: rgba(58,74,99,0.65);
+      box-shadow: 0 10px 24px rgba(58,74,99,.14), 0 10px 24px rgba(0,0,0,.25);
+    }
+
+    .decisionTitle {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-weight: 950;
+      letter-spacing: .2px;
+      opacity: .95;
+    }
+    .decisionAction {
+      text-align:center;
+      font-size: 28px;
+      font-weight: 950;
+      margin: 8px 0 6px;
+      letter-spacing: -0.5px;
+    }
+    .decisionReason {
+      text-align:center;
+      color: rgba(255,255,255,0.92);
+      font-weight: 650;
+      line-height: 1.45;
+    }
+    .decisionRule {
+      margin-top: 10px;
+      text-align:center;
+      opacity: .92;
+      font-style: italic;
+      font-weight: 650;
+    }
+
+    /* Sticky right-side panels */
+    .sticky { position: sticky; top: 76px; }
+
+    /* Responsive */
+    @media (max-width: 1100px){
+      .layout { grid-template-columns: 1fr; }
+      .sticky { position: static; top: auto; }
+    }
+
+    footer {
+      padding: 10px 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
   <header>
-    <div>
-      <div class="title" id="pageTitle">Trade Senate</div>
-      <div class="meta" id="pageMeta">Loading…</div>
+    <div class="titleWrap">
+      <div class="title">
+        <span id="pageTitle">Trade Senate</span>
+      </div>
+      <div class="subtitle" id="pageMeta">Loading…</div>
     </div>
     <div class="row">
-      <button class="btn" id="btnRefresh">Refresh</button>
-      <span class="pill warn" id="statusPill">WAITING</span>
+      <button class="btn" id="btnRefresh">↻ Refresh</button>
+      <span class="pill neutral" id="statusPill">WAITING</span>
     </div>
   </header>
 
-  <main>
-    <section class="card" id="contextCard">
-      <h2>Context</h2>
+  <div class="layout">
+    <section class="card sticky" id="contextCard">
+      <h2>Market Context</h2>
       <div class="kv" id="contextKV"></div>
+
+      <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+        <h2>Anchors</h2>
+        <div class="kv" id="metaKV"></div>
+      </div>
     </section>
 
     <section class="card" id="agentsCard">
@@ -58,16 +321,23 @@
       <div id="agentsList"></div>
     </section>
 
-    <section class="card" id="decisionCard">
+    <section class="card sticky" id="decisionCard">
       <h2>Decision</h2>
-      <div class="kv" id="decisionKV"></div>
-      <div class="agentBody" id="decisionReason" style="margin-top:10px;"></div>
-      <div class="agentBody" id="decisionRule" style="margin-top:10px;"></div>
+      <div class="decisionHero" id="decisionHero" hidden>
+        <div class="decisionTitle">
+          <span>✓</span><span>Senate Decision</span>
+        </div>
+        <div class="decisionAction" id="decisionAction">—</div>
+        <div class="decisionReason" id="decisionReason"></div>
+        <div class="decisionRule" id="decisionRule"></div>
+      </div>
+
+      <div class="kv" id="decisionKV" style="margin-top:12px;"></div>
     </section>
-  </main>
+  </div>
 
   <footer>
-    UI reads <code>../STATE/debate.json</code> every refresh. If missing, it falls back to embedded demo data.
+    UI reads <code>../STATE/debate.json</code> every refresh. If missing/unreachable, it falls back to embedded DEMO data.
   </footer>
 
 <script>
@@ -90,19 +360,61 @@ function fmt(v){
   return String(v);
 }
 
+function stanceKind(stance){
+  const s = String(stance || "NO_TRADE").toUpperCase();
+  if (s === "LONG") return "bull";
+  if (s === "SHORT") return "bear";
+  return "risk";
+}
+
+function autoTag(stance){
+  const s = String(stance || "NO_TRADE").toUpperCase();
+  if (s === "LONG") return "BULLISH BIAS";
+  if (s === "SHORT") return "BEARISH BIAS";
+  return "WAIT / NO EDGE";
+}
+
+function stancePill(stance, confidence){
+  const s = String(stance || "NO_TRADE").toUpperCase();
+  const conf = (typeof confidence === "number") ? confidence : null;
+  const pct = (conf === null) ? "—" : `${Math.round(conf * 100)}%`;
+  const label = `${s} · ${pct}`;
+
+  const kind =
+    (s === "LONG") ? "good" :
+    (s === "SHORT") ? "bad" :
+    "neutral";
+
+  return { label, kind, raw: conf };
+}
+
 function setPill(kind, text){
   const pill = document.getElementById("statusPill");
-  pill.classList.remove("good","bad","warn");
+  pill.classList.remove("good","bad","warn","neutral");
   pill.classList.add(kind);
   pill.textContent = text;
 }
 
-function render(data){
-  document.getElementById("pageTitle").textContent = data?.meta?.title || "Trade Senate";
-  document.getElementById("pageMeta").textContent = `v${data?.meta?.schemaVersion || "?"} · seq ${data?.meta?.sequence ?? "?"} · ${data?.meta?.generatedAt || "?"}`;
+function decisionKind(action){
+  const a = String(action || "NO_TRADE").toUpperCase();
+  if (a === "LONG") return "bull";
+  if (a === "SHORT") return "bear";
+  return "risk";
+}
 
-  // context
-  const ctx = data.context || {};
+function render(data){
+  const meta = data?.meta || {};
+  const ctx = data?.context || {};
+  const dec = data?.decision || {};
+  const agents = Array.isArray(data?.agents) ? data.agents : [];
+
+  document.getElementById("pageTitle").textContent = meta.title || "Trade Senate";
+
+  const statusText = document.getElementById("statusPill")?.textContent || "";
+  document.getElementById("pageMeta").textContent =
+    `${statusText} · v${meta.schemaVersion || "?"} · seq ${meta.sequence ?? "?"} · ${meta.generatedAt || "?"}`;
+
+  // Context KV
   const contextKV = document.getElementById("contextKV");
   contextKV.innerHTML = "";
   const ctxRows = [
@@ -122,36 +434,109 @@ function render(data){
     contextKV.appendChild(kEl); contextKV.appendChild(vEl);
   }
 
-  // agents
+  // Anchors KV (anti-hallucination)
+  const metaKV = document.getElementById("metaKV");
+  metaKV.innerHTML = "";
+  const metaRows = [
+    ["State hash", meta.stateHash ? `<code>${meta.stateHash}</code>` : "—"],
+    ["Sequence", meta.sequence],
+    ["Generated", meta.generatedAt]
+  ];
+  for (const [k,v] of metaRows){
+    const kEl = document.createElement("div"); kEl.className="k"; kEl.textContent=k;
+    const vEl = document.createElement("div"); vEl.className="v";
+    if (typeof v === "string" && v.includes("<code>")) vEl.innerHTML = v; else vEl.textContent = fmt(v);
+    metaKV.appendChild(kEl); metaKV.appendChild(vEl);
+  }
+
+  // Agents
   const agentsList = document.getElementById("agentsList");
   agentsList.innerHTML = "";
-  const agents = Array.isArray(data.agents) ? data.agents : [];
   for (const a of agents){
-    const wrap = document.createElement("div");
-    wrap.className = "agent";
-    const top = document.createElement("div");
-    top.className = "agentTop";
-    const left = document.createElement("div");
-    left.innerHTML = `<div class="agentName">${a.name || "Agent"}</div><div class="agentRole">${a.role || ""}</div>`;
-    const stance = document.createElement("span");
-    const s = (a.stance || "NO_TRADE").toUpperCase();
-    stance.className = "pill " + (s === "LONG" ? "good" : s === "SHORT" ? "bad" : "warn");
-    stance.textContent = `${s} · ${(a.confidence ?? 0).toFixed(2)}`;
-    top.appendChild(left); top.appendChild(stance);
+    const kind = stanceKind(a.stance);
+    const pill = stancePill(a.stance, a.confidence);
 
-    const body = document.createElement("div");
-    body.className = "agentBody";
     const paras = Array.isArray(a.paragraphs) ? a.paragraphs : (a.paragraphs ? [String(a.paragraphs)] : []);
     const reasons = Array.isArray(a.reasoning) ? a.reasoning : (a.reasoning ? [String(a.reasoning)] : []);
-    body.innerHTML = `<div style="font-weight:600">${a.summary || ""}</div>` +
-      (paras.length ? `<div style="margin-top:6px">${paras.map(p=>`<div>• ${p}</div>`).join("")}</div>` : "") +
-      (reasons.length ? `<ul>${reasons.map(r=>`<li>${r}</li>`).join("")}</ul>` : "");
-    wrap.appendChild(top); wrap.appendChild(body);
+
+    const wrap = document.createElement("div");
+    wrap.className = "agent";
+
+    // top row
+    const top = document.createElement("div");
+    top.className = "agentTop";
+
+    const left = document.createElement("div");
+    left.className = "agentLeft";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar " + kind;
+    avatar.textContent = (kind === "bull") ? "▲" : (kind === "bear") ? "▼" : "●";
+
+    const nameRole = document.createElement("div");
+    nameRole.innerHTML = `<div class="agentName">${a.name || "Agent"}</div><div class="agentRole">${a.role || ""}</div>`;
+
+    left.appendChild(avatar);
+    left.appendChild(nameRole);
+
+    const stance = document.createElement("span");
+    stance.className = "pill " + pill.kind;
+    stance.textContent = pill.label;
+    if (typeof pill.raw === "number") stance.title = `confidence_raw=${pill.raw.toFixed(4)}`;
+
+    top.appendChild(left);
+    top.appendChild(stance);
+
+    // body
+    const body = document.createElement("div");
+    body.className = "agentBody";
+
+    const claim = document.createElement("div");
+    claim.className = "claim " + kind;
+    claim.innerHTML = `<strong>Claim:</strong> ${a.summary || "—"}`;
+
+    const parasDiv = document.createElement("div");
+    parasDiv.className = "paras";
+    if (paras.length){
+      parasDiv.innerHTML = paras.map(p => `<div class="p"><span class="dot">•</span><span>${p}</span></div>`).join("");
+    }
+
+    const details = document.createElement("details");
+    details.className = "reasoning";
+    details.open = true;
+
+    const summary = document.createElement("summary");
+    summary.innerHTML = `<span>Reasoning <span style="opacity:.7;font-weight:800">(evidence)</span></span><span class="chev">▼</span>`;
+    details.appendChild(summary);
+
+    if (reasons.length){
+      const ul = document.createElement("ul");
+      ul.innerHTML = reasons.map(r => `<li>${r}</li>`).join("");
+      details.appendChild(ul);
+    } else {
+      const empty = document.createElement("div");
+      empty.style.marginTop = "8px";
+      empty.style.color = "var(--muted)";
+      empty.textContent = "—";
+      details.appendChild(empty);
+    }
+
+    const t = (a.tag && String(a.tag).trim()) ? String(a.tag).trim() : autoTag(a.stance);
+    const tag = document.createElement("div");
+    tag.className = "tag";
+    tag.textContent = t;
+
+    body.appendChild(claim);
+    if (paras.length) body.appendChild(parasDiv);
+    body.appendChild(details);
+    body.appendChild(tag);
+
+    wrap.appendChild(top);
+    wrap.appendChild(body);
     agentsList.appendChild(wrap);
   }
 
-  // decision
-  const dec = data.decision || {};
+  // Decision KV
   const decisionKV = document.getElementById("decisionKV");
   decisionKV.innerHTML = "";
   const decRows = [
@@ -163,25 +548,52 @@ function render(data){
     const vEl = document.createElement("div"); vEl.className="v"; vEl.textContent=fmt(v);
     decisionKV.appendChild(kEl); decisionKV.appendChild(vEl);
   }
-  document.getElementById("decisionReason").textContent = dec.reason ? `Reason: ${dec.reason}` : "";
-  document.getElementById("decisionRule").textContent = dec.rule ? `Rule: ${dec.rule}` : "";
+
+  // Decision hero + border class
+  const hero = document.getElementById("decisionHero");
+  const heroKind = decisionKind(dec.action);
+
+  const action = (dec.action || "").trim();
+  const reason = (dec.reason || "").trim();
+  const rule = (dec.rule || "").trim();
+
+  hero.classList.remove("bull","bear","risk");
+  hero.classList.add(heroKind);
+
+  if (action || reason || rule){
+    hero.hidden = false;
+    document.getElementById("decisionAction").textContent = action || "—";
+    document.getElementById("decisionReason").textContent =
+      [reason, dec.nextCheck ? `Next: ${dec.nextCheck}` : ""].filter(Boolean).join(" · ");
+    document.getElementById("decisionRule").textContent = rule ? `Arbiter constitution: ${rule}` : "";
+  } else {
+    hero.hidden = true;
+    document.getElementById("decisionAction").textContent = "—";
+    document.getElementById("decisionReason").textContent = "";
+    document.getElementById("decisionRule").textContent = "";
+  }
 }
 
 async function loadOnce(){
   const url = "../STATE/debate.json?ts=" + Date.now();
   try{
-    const res = await fetch(url, { cache: "no-store" });
+    if (window.location.protocol === "file:") throw new Error("file:// protocol");
+    const res = await fetch(url, { cache: "no-store", headers: { "Pragma": "no-cache" } });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
-    setPill("good","LIVE");
+    setPill("good","LIVE JSON");
     render(data);
   } catch(e){
-    setPill("warn","DEMO");
+    setPill("neutral","OFFLINE DEMO");
     render(DEMO);
   }
 }
 
 document.getElementById("btnRefresh").addEventListener("click", loadOnce);
+
+// Auto-refresh every 3 seconds when served over http(s)
+if (window.location.protocol !== "file:") setInterval(loadOnce, 3000);
+
 loadOnce();
 </script>
 </body>

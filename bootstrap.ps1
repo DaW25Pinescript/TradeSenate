@@ -1,21 +1,20 @@
-# TradeSenate bootstrap (Windows PowerShell)
-# Run from the repo root:  powershell -ExecutionPolicy Bypass -File .\bootstrap.ps1
-
 $ErrorActionPreference = "Stop"
+Set-Location $PSScriptRoot
 
 Write-Host "== TradeSenate bootstrap =="
 
-# 1) Create venv if missing
-if (!(Test-Path ".\.venv")) {
-  py -m venv .venv
-  Write-Host "Created .venv"
+# Prefer python, fallback to py
+$py = Get-Command python -ErrorAction SilentlyContinue
+if (-not $py) { $py = Get-Command py -ErrorAction SilentlyContinue }
+if (-not $py) { throw "Python not found. Install Python and ensure it's on PATH." }
+
+# Generate a demo debate.json (non-fatal if it fails)
+try {
+  & $py.Path ".\STATE\debate_writer.py"
+  Write-Host "Generated STATE\debate.json"
+} catch {
+  Write-Warning "Could not generate debate.json (continuing): $($_.Exception.Message)"
 }
 
-# 2) Generate demo debate.json
-.\.venv\Scripts\python.exe .\STATE\debate_writer.py
-
-Write-Host "Demo STATE\debate.json generated."
-
-# 3) Start server
-Write-Host "Starting local server: http://localhost:8000/UI/debate.html"
-.\.venv\Scripts\python.exe -m http.server 8000
+Write-Host "Serving http://localhost:8000/UI/debate.html"
+& $py.Path -m http.server 8000
