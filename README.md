@@ -18,7 +18,12 @@ py -m venv .venv
 
 2) Generate a demo debate file:
 ```powershell
-py .\STATE\debate_writer.py
+py .\STATE\debate_writer.py --validate
+```
+
+To generate deterministic output (useful in tests/replays), pin a sequence:
+```powershell
+py .\STATE\debate_writer.py --sequence 1700000000 --validate
 ```
 
 3) Run a local web server from the repo root:
